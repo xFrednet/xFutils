@@ -1,9 +1,9 @@
 # xFutils
-The goal of this Project is to create a system tray for windows. The systemtray will support plugins and links that can be started trough the menu.
+The goal of this Project is to create a system tray for windows. The system tray will support plugins and links that can be started through the menu.
 
 Planed Plugins:
-- Extended Clipboard Plugin (A way to recall the last few Clipboard contens)
-- Timer Plugin (With a Stopwatch, a Countdowntimer and a usual Timer)
+- Extended Clipboard Plugin (A way to recall the last few clipboard contents)
+- Timer Plugin (With a stopwatch, a countdown timer and a usual timer)
 - PC use statistic Plugin (Count's the time you actually spend on the PC, what applications you use, keyboard and mouse interactions etc.)
 
 ## WARNING
