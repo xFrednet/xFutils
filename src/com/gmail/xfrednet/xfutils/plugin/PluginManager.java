@@ -27,10 +27,10 @@ public class PluginManager {
 	}
 
 	List<MenuElement> getPluginElements() {
-
+		return null;
 	}
 
 	JPanel getSettingsPanel() {
-
+		return null;
 	}
 }

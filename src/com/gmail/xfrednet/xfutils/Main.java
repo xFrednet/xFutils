@@ -2,7 +2,6 @@ package com.gmail.xfrednet.xfutils;
 
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.Logger;
-import org.jetbrains.annotations.NotNull;
 
 public class Main {
 
@@ -15,7 +14,7 @@ public class Main {
 
 		logger.logInfo("main: Me message"); // TODO 04.11.2018 remove this log
 	}
-	private static boolean ProcessArgs(@NotNull String[] args) {
+	private static boolean ProcessArgs(String[] args) {
 		// TODO 04.11.2018 add -noplugin && -nolinks
 		for (String arg : args) {
 			switch (arg) {
