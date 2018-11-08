@@ -4,7 +4,7 @@ import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
 public class Main {
-
+	
 	static private Logger logger = null;
 	static private boolean debugEnabled = false;
 
