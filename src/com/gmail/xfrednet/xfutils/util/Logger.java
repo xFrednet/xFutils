@@ -11,12 +11,16 @@ public abstract class Logger {
 	protected static final int LOG_LEVEL_DEBUG = 1;
 
 	private boolean enableDebugLog;
+	
+	private static String GetTimestamp() {
+		return new SimpleDateFormat("HH:mm:ss").format(new Date());
+	}
 
 	public Logger(boolean enableDebugLog) {
 		this.enableDebugLog = enableDebugLog;
 	}
-	private static String GetTimestamp() {
-		return new SimpleDateFormat("HH:mm:ss").format(new Date());
+	public boolean endLog() {
+		return true;
 	}
 
 	abstract protected void logMessage(String message, int logLevel);

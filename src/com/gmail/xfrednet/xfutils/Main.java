@@ -1,6 +1,7 @@
 package com.gmail.xfrednet.xfutils;
 
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
+import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
@@ -10,10 +11,13 @@ public class Main {
 	static private boolean debugEnabled = false;
 
 	public static void main(String[] args) {
-		if (!ProcessArgs(args))
+		if (!ProcessArgs(args)) {
+			logger.endLog();			
 			return; // ProcessArgs has failed
-
-		logger.logInfo("main: Me message"); // TODO 04.11.2018 remove this log
+		}
+// TODO 04.11.2018 remove this log
+		logger.logInfo("main: Me message"); 
+		logger.endLog();
 	}
 	private static boolean ProcessArgs(String[] args) {
 		// TODO 04.11.2018 add -noplugin && -nolinks
@@ -24,14 +28,18 @@ public class Main {
 				break;
 			case "-conlog":
 				if (logger != null) {
-					logger.logError("ProcessArgs: \"-conlog\": Only on log option can be selected at a time.");
+					logger.logError("ProcessArgs: \"-conlog\": Only one log option can be selected at a time.");
 				}
 				logger = new ConsoleLogger(debugEnabled);
 				logger.logInfo("ProcessArgs: The log will be written to the console.");
 				break;
-			case "-fielog":
-				System.err.println("ProcessArgs: \"-fielog\" has not been implemented yet.");
-				return false;
+			case "-filelog":
+				if (logger != null) {
+					logger.logError("ProcessArgs: \"-filelog\": Only one log option can be selected at a time.");
+				}
+				logger = new FileLogger(debugEnabled);
+				logger.logInfo("ProcessArgs: The log will be written to a file.");
+				break;
 			case "-help":
 			default:
 				System.out.println("Arguments: [-debug][-conlog | -filelog]");
