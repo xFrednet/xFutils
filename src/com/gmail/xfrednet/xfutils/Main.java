@@ -1,6 +1,7 @@
 package com.gmail.xfrednet.xfutils;
 
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
+import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
 public class Main {
@@ -45,9 +46,7 @@ public class Main {
 
 		// logger validation
 		if (logger == null) {
-			// TODO 04.11.2018: create a NoLogLogger
-			System.err.println("ProcessArgs: No log option was selected");
-			return false;
+			logger = new NoLogLogger();
 		}
 
 		// debug info
