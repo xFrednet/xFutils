@@ -3,14 +3,17 @@ package com.gmail.xfrednet.xfutils.plugin;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PluginManager {
 
-	private static final String PLUGIN_DIR = "./plugins/";
+	private static final String PLUGIN_DIR = "plugins\\";
 
 	Logger logger;
 	List<IPlugin> plugins;
@@ -25,7 +28,14 @@ public class PluginManager {
 			return new File[0];
 		}
 		
-		TODO
+		File[] files = pluginDir.listFiles(new PluginFileFilter());
+		//TODO remove dirTestCodeIfunneccersceagfieshfoihoiewhgfoiuewgfew
+		for (File file : files) {
+			if (file.isDirectory())
+				return null;
+		}
+		
+		return files;
 		//
 	}
 	private boolean validatePluginDir(File pluginDir) {
@@ -72,7 +82,10 @@ public class PluginManager {
 	}
 	
 	public void initPlugins() {
-
+		File[] plugins = getAvailablePlugins();
+		for (File plugin : plugins) {
+			logger.logDebugMessage("Found plugin: " + plugin.getAbsolutePath());
+		}
 	}
 	public void terminatePlugins() {
 
@@ -91,4 +104,16 @@ public class PluginManager {
 	JPanel getSettingsPanel() {
 		return null;
 	}
+}
+
+class PluginFileFilter implements FileFilter {
+
+	@Override
+	public boolean accept(File pathname) {
+		return !pathname.isDirectory() && 
+				pathname.getName().endsWith(".jar");
+	}
+
+
+	
 }

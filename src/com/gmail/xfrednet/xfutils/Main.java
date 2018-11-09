@@ -3,6 +3,7 @@ package com.gmail.xfrednet.xfutils;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
+import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
 public class Main {
@@ -15,8 +16,10 @@ public class Main {
 			logger.endLog();			
 			return; // ProcessArgs has failed
 		}
-// TODO 04.11.2018 remove this log
-		logger.logInfo("main: Me message"); 
+		
+		PluginManager manager = new PluginManager(logger);
+		manager.initPlugins();
+		
 		logger.endLog();
 	}
 	private static boolean ProcessArgs(String[] args) {
