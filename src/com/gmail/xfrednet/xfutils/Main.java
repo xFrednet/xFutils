@@ -13,7 +13,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		if (!ProcessArgs(args)) {
-			logger.endLog();			
+			logger.endLog();
 			return; // ProcessArgs has failed
 		}
 		
