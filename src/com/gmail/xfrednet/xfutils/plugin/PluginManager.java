@@ -37,15 +37,30 @@ public class PluginManager {
 	}
 
 	public void initPlugins() {
+
+		List<File> pluginFiles = getEnabledPluginFiles();
+
+	}
+	List<File> getEnabledPluginFiles() {
 		File[] pluginFiles = getAvailablePlugins();
-
-		List<String> names = new ArrayList<>();
-		names.add("hello.jar");
-		names.add("name 2.jar");
-		names.add("me not");
-		saveEnabledPluginsList(names);
-
-		loadEnabledPluginsList();
+		List<String> enabledPluginNames = loadEnabledPluginsList();
+		
+		// test if the plugin file name is inside the "enabledPluginNames"-List
+		List<File> enabledPlugins = new ArrayList<>();
+		for (File pluginFile : pluginFiles) {
+			// test if the name of the plugin is inside the "enabledPluginNames"-List
+			if (enabledPluginNames.contains(pluginFile.getName())) {
+				// add it to the enabled plugins
+				enabledPlugins.add(pluginFile);
+				logger.logDebugMessage("getEnabledPluginFiles: " +
+						pluginFile.getName() + " is enabled.");
+			} else {
+				logger.logDebugMessage("getEnabledPluginFiles: " +
+						pluginFile.getName() + " is disabled.");
+			}
+		}
+		
+		return enabledPlugins;
 	}
 	// File interactions
 	private File[] getAvailablePlugins() {
@@ -213,7 +228,7 @@ public class PluginManager {
 
 	}
 
-	List<MenuElement> getPluginElements() {
+	List<MenuElement> getPluginMenuElements() {
 		List<MenuElement> menuItemList = new ArrayList<>(plugins.size());
 		
 		for (IPlugin plugin : this.plugins) {
