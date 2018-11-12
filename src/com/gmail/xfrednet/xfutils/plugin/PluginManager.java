@@ -1,5 +1,6 @@
 package com.gmail.xfrednet.xfutils.plugin;
 
+import com.gmail.xfrednet.xfutils.Main;
 import com.gmail.xfrednet.xfutils.util.Logger;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -17,12 +18,18 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 public class PluginManager {
 
 	private static final String PLUGIN_DIR             = "plugins\\";
+	private static final String PLUGIN_DATA_DIR        = PLUGIN_DIR + "data\\%s\\";
 	private static final String ENABLED_PLUGINS_FILE   = PLUGIN_DIR + ".config.xml";
 	private static final String XML_ROOT_ELEMENT       = "pluginmamanger";
 	private static final String XML_ENABLED_PLUGIN_TAG = "plugin";
@@ -36,14 +43,90 @@ public class PluginManager {
 		plugins = new ArrayList<>();
 	}
 
+	// ##########################################
+	// # initPlugins #
+	// ##########################################
 	public void initPlugins() {
-
 		List<File> pluginFiles = getEnabledPluginFiles();
-
+		
+		loadPlugins(pluginFiles);
+		
+		// initialize plugins
+		// I use a for loop to be able to remove items while looping
+		for (int pluginIndex = 0; pluginIndex < this.plugins.size(); pluginIndex++) {
+			IPlugin plugin = this.plugins.get(pluginIndex);
+			try {
+				String dataDir = String.format(PLUGIN_DATA_DIR, plugin.getDisplayName());
+				plugin.init(logger, this, dataDir);
+				logger.logInfo("initPlugins: The plugin \"" +
+						plugin.getDisplayName() + "\"  initialized successfull"); 
+			} catch (Exception e) {
+				logger.logAlert("initPlugins: The plugin \"" +
+						plugin.getDisplayName() + "\" failed to initialize", e); 
+				// remove the invalid plugin
+				this.plugins.remove(pluginIndex);
+				pluginIndex--;
+			}
+		}
 	}
-	List<File> getEnabledPluginFiles() {
+	@SuppressWarnings("resource")
+	private void loadPlugins(List<File> pluginFiles) {
+		// loop though the files
+		for (File file : pluginFiles) {
+			// Creates JarFile object and finds it's main class
+			try {
+				// Retrieve the interface(main) class
+				Class mainClass = GetInterfaceClass(file);
+				if (mainClass == null) {
+					logger.logAlert("loadPlugins: GetInterfaceClass has failed to find the interface class");
+				}
+				
+				// Initialize a new instance
+				IPlugin plugin = (IPlugin)mainClass.newInstance();
+				this.plugins.add(plugin);
+				
+			} catch (Exception e) {
+				logger.logError(
+						"loadPlugins: Something failed during the plugin loading of the Plugin: \"" + 
+						 file.getName() + "\".", e);
+			}
+		}
+	}
+	static Class GetInterfaceClass(File file) {
+		// Creates JarFile object and finds it's main class
+		try {
+			// TODO What does Eclipse has against this object?
+			JarFile jarFile = new JarFile(file);
+			Manifest manifest = jarFile.getManifest();
+			String mainClassName = manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+			
+			// Load the class
+			Class mainClass = new URLClassLoader(new URL[]{file.toURL()}).loadClass(mainClassName);
+			Class[] interfaces = mainClass.getInterfaces();
+			for (Class testInterface : interfaces) {
+				// Test if the current class is the IPlugin-Interface
+				if (testInterface.getName().equals(IPlugin.class.getName())) {
+					// Return the main class because it implements the IPlugin-Interface
+					return mainClass;
+				}
+			}
+			
+			// The main class does not implement the required IPluginin interface
+			return null;
+			
+		} catch (Exception e) {
+			Main.logger.logError(
+					"GetInterfaceClass: Something failed during the plugin loading of the Plugin: \"" + 
+					 file.getName() + "\".", e);
+			return null;
+		}
+	}
+	// ######################
+	// # getEnabledPluginFiles
+	// ######################
+	private List<File> getEnabledPluginFiles() {
 		File[] pluginFiles = getAvailablePlugins();
-		List<String> enabledPluginNames = loadEnabledPluginsList();
+		List<String> enabledPluginNames = loadEnabledPluginNames();
 		
 		// test if the plugin file name is inside the "enabledPluginNames"-List
 		List<File> enabledPlugins = new ArrayList<>();
@@ -129,7 +212,7 @@ public class PluginManager {
 		return true;
 	}
 	// Settings interaction
-	private List<String> loadEnabledPluginsList() {
+	private List<String> loadEnabledPluginNames() {
 		// get the file
 		File enabledPluginsFile = new File(ENABLED_PLUGINS_FILE);
 		logger.logDebugMessage("loadEnabledPluginsList: The path of the config is: " + enabledPluginsFile.getAbsolutePath());
@@ -193,7 +276,7 @@ public class PluginManager {
 		// - I just hope that this is readable enough... and that no one have has to read this again.
 		// - ¯\_(ツ)_/¯
 	}
-	private boolean saveEnabledPluginsList(List<String> enabledPlugins) {
+	private boolean saveEnabledPluginNames(List<String> enabledPlugins) {
 		try {
 			DocumentBuilderFactory dbFactory =
 				DocumentBuilderFactory.newInstance();
@@ -223,9 +306,21 @@ public class PluginManager {
 
 		return false;
 	}
-
+	
+	// ##########################################
+	// # initPlugins #
+	// ##########################################
 	public void terminatePlugins() {
-
+		for (IPlugin plugin : this.plugins) {
+			try {
+				plugin.terminate();
+			} catch (Exception e) {
+				logger.logAlert("terminatePlugins: The plugin \"" +
+						plugin.getDisplayName() + "\" failed to terminate", e); 
+			}
+		}
+		
+		this.plugins.clear();
 	}
 
 	List<MenuElement> getPluginMenuElements() {
@@ -251,7 +346,10 @@ class PluginFileFilter implements FileFilter {
 		if (pathname.isDirectory())
 			return false;
 
-		return pathname.getName().endsWith(".jar");
+		if (!pathname.getName().endsWith(".jar"))
+			return false;
+		
+		return PluginManager.GetInterfaceClass(file) != null;
 	}
 
 }

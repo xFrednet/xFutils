@@ -8,7 +8,7 @@ import com.gmail.xfrednet.xfutils.util.Logger;
 
 public class Main {
 	
-	static private Logger logger = null;
+	public static Logger logger = null;
 	static private boolean debugEnabled = false;
 
 	public static void main(String[] args) {

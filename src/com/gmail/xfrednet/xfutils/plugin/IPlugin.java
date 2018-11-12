@@ -13,7 +13,7 @@ public interface IPlugin {
 	String getDescription();
 
 	boolean init(Logger logger, PluginManager manager, String pluginDir) throws Exception;
-	boolean cleanup() throws Exception;
+	boolean terminate() throws Exception;
 	
 	JMenu getSystemTrayMenu();
 	
