@@ -115,9 +115,9 @@ public class PluginManager {
 			return null;
 			
 		} catch (Exception e) {
-			Main.logger.logError(
-					"GetInterfaceClass: Something failed during the plugin loading of the Plugin: \"" + 
-					 file.getName() + "\".", e);
+			Main.logger.logAlert(
+					"GetInterfaceClass: Unable to retive information from the jar file: \"" + 
+					 file.getName() + "\". e: \"" + e.getMessage() + "\"");
 			return null;
 		}
 	}
@@ -341,12 +341,12 @@ public class PluginManager {
 class PluginFileFilter implements FileFilter {
 
 	@Override
-	public boolean accept(File pathname) {
+	public boolean accept(File file) {
 
-		if (pathname.isDirectory())
+		if (file.isDirectory())
 			return false;
 
-		if (!pathname.getName().endsWith(".jar"))
+		if (!file.getName().endsWith(".jar"))
 			return false;
 		
 		return PluginManager.GetInterfaceClass(file) != null;
