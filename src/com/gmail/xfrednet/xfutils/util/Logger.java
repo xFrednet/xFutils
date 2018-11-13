@@ -63,4 +63,7 @@ public abstract class Logger {
 		}
 	}
 
+	public boolean isDebugLogEnabled() {
+		return this.enableDebugLog;
+	}
 }
