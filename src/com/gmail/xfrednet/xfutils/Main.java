@@ -30,7 +30,6 @@ public class Main {
 		logger.endLog();
 	}
 	private static boolean ProcessArgs(String[] args) {
-		// TODO 04.11.2018 add -noplugins && -nolinks
 		for (String arg : args) {
 			switch (arg) {
 			case "-debug":
