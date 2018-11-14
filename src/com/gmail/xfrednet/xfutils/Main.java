@@ -4,6 +4,13 @@ import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
+import java.awt.Image;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
@@ -14,6 +21,9 @@ public class Main {
 	private static boolean argPluginsEnabled = false;
 	private static boolean argLinksEnabled   = false;
 	
+	// This value should only be used by the terminate function
+	private static Main instance             = null;
+	
 	// ##########################################
 	// # main #
 	// ##########################################
@@ -23,11 +33,20 @@ public class Main {
 			return; // ProcessArgs has failed
 		}
 		
+		Main main = new Main();
+		if (!main.init()) {
+			logger.logError("main: Something failed durring the initialize of Main. Goodbye");
+			System.exit(1); // TODO create predefined errors
+		}
 		
-		PluginManager manager = new PluginManager(logger);
-		manager.initPlugins();
+		// Add ShutdownHook to make sure everything terminates correctly
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				Main.TerminateApp();
+			}
+		});
 		
-		logger.endLog();
 	}
 	private static boolean ProcessArgs(String[] args) {
 		for (String arg : args) {
@@ -94,4 +113,41 @@ public class Main {
 		}
 		return true;
 	}
+	private static void TerminateApp() {
+		instance.terminate();
+		logger.endLog();
+	}
+	
+	// ####################################################
+	// # Main Class #
+	// ####################################################
+	TrayIcon trayIcon;
+	
+	private Main() {
+		this.trayIcon = null;
+	}
+	
+	private boolean init() {
+		if (!SystemTray.isSupported()) {
+			logger.logError("Main: The current system does not support a system tray.");
+			return false;
+		}
+		
+		try {
+			Image icon = ImageIO.read((ClassLoader.getSystemClassLoader().getResource("icon.png")));
+			this.trayIcon = new TrayIcon(icon);
+			SystemTray.getSystemTray().add(trayIcon);
+			
+			logger.logInfo("Main.init: Added the TrayIcon to the SystemTray.");
+			return true;
+		} catch (Exception e) {
+			logger.logError("Main.init: Something failed during the initialization!", e);
+			return false;
+		}
+	}
+	private void terminate() {
+		SystemTray.getSystemTray().remove(trayIcon);
+		logger.logInfo("Main.terminate: Removed the TrayIcon from the SystemTray");
+	}
+	
 }
