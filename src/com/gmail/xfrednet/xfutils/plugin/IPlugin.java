@@ -2,7 +2,7 @@ package com.gmail.xfrednet.xfutils.plugin;
 
 import com.gmail.xfrednet.xfutils.util.Logger;
 
-import javax.swing.*;
+import java.awt.MenuItem;
 
 public interface IPlugin {
 	
@@ -15,7 +15,7 @@ public interface IPlugin {
 	boolean init(Logger logger, PluginManager manager, String pluginDir) throws Exception;
 	boolean terminate() throws Exception;
 	
-	JMenu getSystemTrayMenu();
+	MenuItem getSystemTrayMenu();
 	
 	// This method will be called when the Plugin
 	// has requested regular updates

@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import java.awt.MenuItem;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -39,7 +40,11 @@ public class PluginManager {
 
 	public PluginManager(Logger logger) {
 		this.logger = logger;
-
+		
+		if (!Main.ArePluginsEnabled) {
+			logger.logError("PluginManager: Someone has created me, but the rest of the application doesn't want me! (Main.argPluginsEnabled == false");
+		}
+		
 		plugins = new ArrayList<>();
 	}
 
@@ -52,7 +57,7 @@ public class PluginManager {
 		loadPlugins(pluginFiles);
 		
 		// initialize plugins
-		// I use a for loop to be able to remove items while looping
+		// I use a for int loop to be able to remove items while looping
 		for (int pluginIndex = 0; pluginIndex < this.plugins.size(); pluginIndex++) {
 			IPlugin plugin = this.plugins.get(pluginIndex);
 			try {
@@ -115,7 +120,7 @@ public class PluginManager {
 			return null;
 			
 		} catch (Exception e) {
-			Main.logger.logAlert(
+			Main.Logger.logAlert(
 					"GetInterfaceClass: Unable to retive information from the jar file: \"" + 
 					 file.getName() + "\". e: \"" + e.getMessage() + "\"");
 			return null;
@@ -323,8 +328,8 @@ public class PluginManager {
 		this.plugins.clear();
 	}
 
-	List<MenuElement> getPluginMenuElements() {
-		List<MenuElement> menuItemList = new ArrayList<>(plugins.size());
+	public List<MenuItem> getPluginMenuElements() {
+		List<MenuItem> menuItemList = new ArrayList<>(plugins.size());
 		
 		for (IPlugin plugin : this.plugins) {
 			menuItemList.add(plugin.getSystemTrayMenu());
