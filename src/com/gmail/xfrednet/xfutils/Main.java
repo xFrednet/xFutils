@@ -138,10 +138,7 @@ public class Main {
 	
 	private TrayIcon trayIcon;
 	private PopupMenu trayMenu;
-	private MenuItem menuLabelPlugins;
-	private MenuItem menuLabelLinks;
-	private MenuItem menuLabelMeta;
-	
+
 	// The PluginManager will only be valid if Main.argPluginsEnabled
 	// is true. So please make sure to check for null before usage.
 	private PluginManager pluginManager;
@@ -149,9 +146,6 @@ public class Main {
 	private Main() {
 		this.trayIcon = null;
 		this.trayMenu = null;
-		this.menuLabelPlugins = null;
-		this.menuLabelLinks = null;
-		this.menuLabelMeta = null;
 		
 		this.pluginManager = null;
 	}
@@ -181,6 +175,9 @@ public class Main {
 		// Menu init
 		initTrayMenu();
 		
+		// init Plugins
+		initPluginManager();
+		
 		// Return le trúe
 		return true;
 	}
@@ -201,9 +198,9 @@ public class Main {
 		this.trayMenu.addSeparator();
 		
 		// Meta section
-		this.menuLabelMeta = new MenuItem("Meta");
-		this.menuLabelMeta.setEnabled(false);
-		this.trayMenu.add(this.menuLabelMeta);
+		MenuItem metaLabel = new MenuItem("Meta");
+		metaLabel.setEnabled(false); // make it a label
+		addMenuItem(metaLabel, MENU_SECTION_META);
 		
 		// "Exit"-item
 		MenuItem exitItem = new MenuItem("Exit"); // TODO create language class
@@ -214,18 +211,13 @@ public class Main {
 		});
 		addMenuItem(exitItem, MENU_SECTION_META);
 		
-		addMenuItem(new MenuItem("S1.0"), 1);
 		addMenuItem(new MenuItem("S2.0"), 2);
 		addMenuItem(new MenuItem("S3.0"), 3);
-		addMenuItem(new MenuItem("S1.1"), 1);
-		addMenuItem(new MenuItem("S1.2"), 1);
-		addMenuItem(new MenuItem("S1.3"), 1);
 		addMenuItem(new MenuItem("S3.1"), 3);
 		addMenuItem(new MenuItem("S3.2"), 3);
 		addMenuItem(new MenuItem("S2.1"), 2);
 		addMenuItem(new MenuItem("S2.2"), 2);
 		addMenuItem(new MenuItem("S2.3"), 2);
-		addMenuItem(new MenuItem("S1.4"), 1);
 		addMenuItem(new MenuItem("S2.4"), 2);
 		addMenuItem(new MenuItem("S3.3"), 3);
 		
@@ -242,10 +234,10 @@ public class Main {
 		this.pluginManager.initPlugins();
 		List<MenuItem> pluginItems = this.pluginManager.getPluginMenuElements();
 		for (MenuItem menuItem : pluginItems) {
-			System.out.print(menuItem.getLabel());
+			addMenuItem(menuItem, MENU_SECTION_PLUGINS);
 		}
-		
 	}
+	// TODO initLinkManager
 	
 	// ##########################################
 	// # terminate
