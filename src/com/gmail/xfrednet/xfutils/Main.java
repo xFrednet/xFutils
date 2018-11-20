@@ -156,7 +156,7 @@ public class Main {
 	// # init
 	// ##########################################
 	private boolean init() {
-		this.language = Language.Init("de");
+		this.language = Language.Init("en");
 		
 		// Test if the TrayIcon is support
 		if (!SystemTray.isSupported()) {
