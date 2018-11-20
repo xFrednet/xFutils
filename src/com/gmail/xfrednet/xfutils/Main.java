@@ -5,18 +5,16 @@ import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
 import java.awt.Image;
-import java.awt.MenuContainer;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.MenuElement;
 
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
+import com.gmail.xfrednet.xfutils.util.Language;
 import com.gmail.xfrednet.xfutils.util.Logger;
 
 public class Main {
@@ -136,6 +134,8 @@ public class Main {
 	private static final int MENU_SECTION_LINKS  = 2;
 	private static final int MENU_SECTION_META   = 3;
 	
+	private Language language;
+	
 	private TrayIcon trayIcon;
 	private PopupMenu trayMenu;
 
@@ -144,6 +144,8 @@ public class Main {
 	private PluginManager pluginManager;
 	
 	private Main() {
+		this.language = null;
+		
 		this.trayIcon = null;
 		this.trayMenu = null;
 		
@@ -154,6 +156,8 @@ public class Main {
 	// # init
 	// ##########################################
 	private boolean init() {
+		this.language = Language.Init("de");
+		
 		// Test if the TrayIcon is support
 		if (!SystemTray.isSupported()) {
 			Logger.logError("Main: The current system does not support a system tray.");
@@ -186,28 +190,27 @@ public class Main {
 		
 		// TODO add settings: showLabels
 		// Plugins section
-		MenuItem pluginsLabel = new MenuItem("Plugins");
+		MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Key.MENU_LABEL_PLUGINS));
 		pluginsLabel.setEnabled(false); // make it a label
 		addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
 		this.trayMenu.addSeparator();
 		
 		// Links section
-		MenuItem linksLabel = new MenuItem("Links");
+		MenuItem linksLabel = new MenuItem(this.language.getString(Language.Key.MENU_LABEL_LINKS));
 		linksLabel.setEnabled(false); // make it a label
 		addMenuItem(linksLabel, MENU_SECTION_LINKS);
 		this.trayMenu.addSeparator();
 		
 		// Meta section
-		MenuItem metaLabel = new MenuItem("Meta");
+		MenuItem metaLabel = new MenuItem(this.language.getString(Language.Key.MENU_LABEL_META));
 		metaLabel.setEnabled(false); // make it a label
 		addMenuItem(metaLabel, MENU_SECTION_META);
 		
 		// "Exit"-item
-		MenuItem exitItem = new MenuItem("Exit"); // TODO create language class
+		MenuItem exitItem = new MenuItem(this.language.getString(Language.Key.MENU_ITEM_EXIT)); // TODO create language class
 		exitItem.addActionListener(e -> {
-			Logger.logDebugMessage("'Exit'-Item: I was activated!");
+			Logger.logDebugMessage("Menu.Exit-Item: I was activated!");
 			System.exit(0);
-			Logger.logDebugMessage("'Exit'-Item: heyyyyy");
 		});
 		addMenuItem(exitItem, MENU_SECTION_META);
 		
