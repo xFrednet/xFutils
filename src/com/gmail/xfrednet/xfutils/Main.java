@@ -190,24 +190,24 @@ public class Main {
 		
 		// TODO add settings: showLabels
 		// Plugins section
-		MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Key.MENU_LABEL_PLUGINS));
+		MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
 		pluginsLabel.setEnabled(false); // make it a label
 		addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
 		this.trayMenu.addSeparator();
 		
 		// Links section
-		MenuItem linksLabel = new MenuItem(this.language.getString(Language.Key.MENU_LABEL_LINKS));
+		MenuItem linksLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
 		linksLabel.setEnabled(false); // make it a label
 		addMenuItem(linksLabel, MENU_SECTION_LINKS);
 		this.trayMenu.addSeparator();
 		
 		// Meta section
-		MenuItem metaLabel = new MenuItem(this.language.getString(Language.Key.MENU_LABEL_META));
+		MenuItem metaLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
 		metaLabel.setEnabled(false); // make it a label
 		addMenuItem(metaLabel, MENU_SECTION_META);
 		
 		// "Exit"-item
-		MenuItem exitItem = new MenuItem(this.language.getString(Language.Key.MENU_ITEM_EXIT)); // TODO create language class
+		MenuItem exitItem = new MenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT)); // TODO create language class
 		exitItem.addActionListener(e -> {
 			Logger.logDebugMessage("Menu.Exit-Item: I was activated!");
 			System.exit(0);

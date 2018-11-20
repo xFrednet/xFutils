@@ -11,7 +11,9 @@ public class Language {
 	
 	public static Language Init(String langName) {
 		Language lang = new Language(langName);
+		
 		if (lang.init()) {
+			// Return the object if init() was successful 
 			return lang;
 		} else {
 			// Try to load the English property file before giving up
@@ -20,6 +22,8 @@ public class Language {
 						"Language.Init: was unable to load the .property file for the language: " +
 						 langName);
 				Main.Logger.logAlert("    -> Language.Init will try to load the English property file");
+				
+				// To understand recursion you have to understand recursion
 				return Init("en");
 			} else {
 				Main.Logger.logError("Language.Init: Was unable to load a .property language file, see previous alert!!!");
@@ -28,9 +32,9 @@ public class Language {
 		}
 	}
 	
-	String language;
-	Locale localeInfo;
-	ResourceBundle resource;
+	private String language;
+	private Locale localeInfo;
+	private ResourceBundle resource;
 	
 	private Language(String lang) {
 		this.language = lang;
@@ -77,7 +81,7 @@ public class Language {
 		return this.localeInfo;
 	}
 	
-	public class Key {
+	public class Keys {
 		public static final String LANG_NAME = "lang_name";
 		
 		public static final String MENU_LABEL_PLUGINS = "menu_label_plugins";
