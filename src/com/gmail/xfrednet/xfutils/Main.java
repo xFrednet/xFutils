@@ -9,6 +9,7 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.io.File;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -43,6 +44,11 @@ public class Main {
 			System.exit(1); // TODO create predefined errors
 		}
 		
+		File link = new File("link.lnk");
+		boolean ex = link.exists();
+		boolean canEx = link.canExecute();
+		
+		
 		// Add ShutdownHook to make sure everything terminates correctly
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -51,6 +57,7 @@ public class Main {
 			}
 		});
 		
+		TerminateApp();
 	}
 	private static boolean ProcessArgs(String[] args) {
 		// This instance prevents the application form running
@@ -154,18 +161,22 @@ public class Main {
 		this.trayMenu = null;
 		
 		this.pluginManager = null;
-		
-		this.settings = new Settings();
-		if (!this.settings.load()) {
-			this.settings.reset();
-			this.settings.save();
-		}
 	}
 	
 	// ##########################################
 	// # init
 	// ##########################################
 	private boolean init() {
+		// Settings
+		this.settings = new Settings();
+		if (!this.settings.load()) {
+			this.settings.reset();
+			if (this.settings.save()) {
+				Logger.logAlert("Main.init: Unable to save the settings after creating new ones!");
+			}
+		}
+		
+		// Language
 		this.language = Language.Init(this.settings.getLanguage());
 		
 		// Test if the TrayIcon is support
@@ -289,7 +300,7 @@ public class Main {
 			
 			separatorCount++;
 			if (separatorCount == separatorNo) {
-				return index; // Return the index if the items are the same
+				return index; // Return the index if the right section has ended
 			}
 		}
 		
