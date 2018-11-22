@@ -9,6 +9,7 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.io.File;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -16,6 +17,7 @@ import javax.imageio.ImageIO;
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.Language;
 import com.gmail.xfrednet.xfutils.util.Logger;
+import com.gmail.xfrednet.xfutils.util.Settings;
 
 public class Main {
 	
@@ -42,6 +44,11 @@ public class Main {
 			System.exit(1); // TODO create predefined errors
 		}
 		
+		File link = new File("link.lnk");
+		boolean ex = link.exists();
+		boolean canEx = link.canExecute();
+		
+		
 		// Add ShutdownHook to make sure everything terminates correctly
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -50,56 +57,58 @@ public class Main {
 			}
 		});
 		
+		TerminateApp();
 	}
 	private static boolean ProcessArgs(String[] args) {
+		// This instance prevents the application form running
+		// into a null pointer
+		Logger = new NoLogLogger();
+		
 		for (String arg : args) {
 			switch (arg) {
 			case "-debug":
 				IsDebugEnabled = true;
 				break;
 			case "-conlog":
-				if (Logger != null) {
+				if (!(Logger instanceof NoLogLogger)) {
 					Logger.logError("ProcessArgs: \"-conlog\": Only one log option can be selected at a time.");
+					break;
 				}
 				Logger = new ConsoleLogger(IsDebugEnabled);
 				Logger.logInfo("ProcessArgs: The log will be written to the console.");
 				break;
 			case "-filelog":
-				if (Logger != null) {
+				if (!(Logger instanceof NoLogLogger)) {
 					Logger.logError("ProcessArgs: \"-filelog\": Only one log option can be selected at a time.");
+					break;
 				}
 				Logger = new FileLogger(IsDebugEnabled);
 				Logger.logInfo("ProcessArgs: The log will be written to a file.");
 				break;
 			case "-noplugins":
 				ArePluginsEnabled = false;
-				if (Logger != null) {
-					Logger.logInfo("ProcessArgs: \"-noplugins\": Plugins will be disabled.");
-				}
+				Logger.logInfo("ProcessArgs: \"-noplugins\": Plugins will be disabled.");
 				break;
 			case "-nolinks":
 				AreLinksEnabled = false;
-				if (Logger != null) {
-					Logger.logInfo("ProcessArgs: \"-nolinks\": Links will be disabled.");
-				}
+				Logger.logInfo("ProcessArgs: \"-nolinks\": Links will be disabled.");
+				break;
+			case "-resetsettings":
+				Settings.SaveResettedSettingsToFile();
 				break;
 			case "-help":
 			default:
-				System.out.println("Arguments: [-debug][-conlog | -filelog][-noplugins][-nolinks]");
+				System.out.println("Arguments: [-debug][-conlog | -filelog][-noplugins][-nolinks][-resetsettings]");
 				System.out.println();
-				System.out.println("    -debug:     Enables debugging information and logs.");
-				System.out.println("    -conlog:    Writes all logs to the console.");
-				System.out.println("    -filelog:   Writes all logs to a log file.");
-				System.out.println("    -help:      Prints this information.");
-				System.out.println("    -nolinks:   Disables link loading, from this application.");
-				System.out.println("    -noplugins: Disables plugin loading, from this application.");
+				System.out.println("    -debug:         Enables debugging information and logs.");
+				System.out.println("    -conlog:        Writes all logs to the console.");
+				System.out.println("    -filelog:       Writes all logs to a log file.");
+				System.out.println("    -help:          Prints this information.");
+				System.out.println("    -nolinks:       Disables link loading, from this application.");
+				System.out.println("    -noplugins:     Disables plugin loading, from this application.");
+				System.out.println("    -resetsettings: Resets the current settings to their defauls and saves them.");
 				return false;
 			}
-		}
-
-		// logger validation
-		if (Logger == null) {
-			Logger = new NoLogLogger();
 		}
 
 		// debug info
@@ -134,6 +143,7 @@ public class Main {
 	private static final int MENU_SECTION_LINKS  = 2;
 	private static final int MENU_SECTION_META   = 3;
 	
+	private Settings settings;
 	private Language language;
 	
 	private TrayIcon trayIcon;
@@ -144,6 +154,7 @@ public class Main {
 	private PluginManager pluginManager;
 	
 	private Main() {
+		this.settings = null;
 		this.language = null;
 		
 		this.trayIcon = null;
@@ -156,7 +167,17 @@ public class Main {
 	// # init
 	// ##########################################
 	private boolean init() {
-		this.language = Language.Init("en");
+		// Settings
+		this.settings = new Settings();
+		if (!this.settings.load()) {
+			this.settings.reset();
+			if (this.settings.save()) {
+				Logger.logAlert("Main.init: Unable to save the settings after creating new ones!");
+			}
+		}
+		
+		// Language
+		this.language = Language.Init(this.settings.getLanguage());
 		
 		// Test if the TrayIcon is support
 		if (!SystemTray.isSupported()) {
@@ -188,26 +209,25 @@ public class Main {
 	private void initTrayMenu() {
 		this.trayMenu = new PopupMenu();
 		
-		// TODO add settings: showLabels
-		// Plugins section
-		MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
-		pluginsLabel.setEnabled(false); // make it a label
-		addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
-		this.trayMenu.addSeparator();
+		this.trayMenu.addSeparator(); // Plugins section
+		this.trayMenu.addSeparator(); // Links section
 		
-		// Links section
-		MenuItem linksLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
-		linksLabel.setEnabled(false); // make it a label
-		addMenuItem(linksLabel, MENU_SECTION_LINKS);
-		this.trayMenu.addSeparator();
-		
-		// Meta section
-		MenuItem metaLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
-		metaLabel.setEnabled(false); // make it a label
-		addMenuItem(metaLabel, MENU_SECTION_META);
+		if (this.settings.AreTrayMenuLabelsShown()) {			
+			MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
+			pluginsLabel.setEnabled(false); // make it a label
+			addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
+			
+			MenuItem linksLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
+			linksLabel.setEnabled(false); // make it a label
+			addMenuItem(linksLabel, MENU_SECTION_LINKS);
+			
+			MenuItem metaLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
+			metaLabel.setEnabled(false); // make it a label
+			addMenuItem(metaLabel, MENU_SECTION_META);
+		}
 		
 		// "Exit"-item
-		MenuItem exitItem = new MenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT)); // TODO create language class
+		MenuItem exitItem = new MenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
 		exitItem.addActionListener(e -> {
 			Logger.logDebugMessage("Menu.Exit-Item: I was activated!");
 			System.exit(0);
@@ -280,7 +300,7 @@ public class Main {
 			
 			separatorCount++;
 			if (separatorCount == separatorNo) {
-				return index; // Return the index if the items are the same
+				return index; // Return the index if the right section has ended
 			}
 		}
 		
