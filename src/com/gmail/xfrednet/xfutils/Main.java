@@ -4,6 +4,7 @@ import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
+import java.awt.Component;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -13,6 +14,9 @@ import java.io.File;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.MenuElement;
 
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.Language;
@@ -23,8 +27,8 @@ public class Main {
 	
 	public static Logger  Logger             = null;
 	public static boolean IsDebugEnabled     = false;
-	public static boolean ArePluginsEnabled  = false;
-	public static boolean AreLinksEnabled    = false;
+	public static boolean ArePluginsEnabled  = true;
+	public static boolean AreLinksEnabled    = true;
 	
 	// This value should only be used by the TerminateApp function
 	private static Main instance             = null;
@@ -43,11 +47,6 @@ public class Main {
 			Logger.logError("main: Something failed durring the initialize of Main. Goodbye");
 			System.exit(1); // TODO create predefined errors
 		}
-		
-		File link = new File("link.lnk");
-		boolean ex = link.exists();
-		boolean canEx = link.canExecute();
-		
 		
 		// Add ShutdownHook to make sure everything terminates correctly
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -147,7 +146,7 @@ public class Main {
 	private Language language;
 	
 	private TrayIcon trayIcon;
-	private PopupMenu trayMenu;
+	private JPopupMenu trayMenu;
 
 	// The PluginManager will only be valid if Main.argPluginsEnabled
 	// is true. So please make sure to check for null before usage.
@@ -207,7 +206,7 @@ public class Main {
 		return true;
 	}
 	private void initTrayMenu() {
-		this.trayMenu = new PopupMenu();
+		this.trayMenu = new JPopupMenu();
 		
 		this.trayMenu.addSeparator(); // Plugins section
 		this.trayMenu.addSeparator(); // Links section
@@ -283,17 +282,18 @@ public class Main {
 	// ##########################################
 	// This method adds the @MenuItem at the end of the section
 	// A new section starts with a separator
-	private void addMenuItem(MenuItem item, int sectionNo) {
+	private void addMenuItem(JMenuItem item, int sectionNo) {
 		int sectionEnd = getSeparatorIndex(sectionNo);
 		this.trayMenu.insert(item, sectionEnd);
 	}
 	private int getSeparatorIndex(int separatorNo) {
 		// Loop through the items
-		int itemCount = this.trayMenu.getItemCount();
+		MenuElement[] elements = this.trayMenu.getComponent();
+		int itemCount = elements.length;
 		int separatorCount = 0;
 		for (int index = 0; index < itemCount; index++) {
 			// Check if the menuItem is a Separator (The label is "-" for separators)
-			MenuItem item = this.trayMenu.getItem(index);
+			Component item = this.trayMenu.getComponent(index);
 			if (!item.getLabel().equals("-")) {
 				continue;
 			}
