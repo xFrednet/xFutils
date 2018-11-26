@@ -4,18 +4,31 @@ import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Event;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.event.AWTEventListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
 import javax.swing.MenuElement;
 
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
@@ -55,8 +68,6 @@ public class Main {
 				Main.TerminateApp();
 			}
 		});
-		
-		TerminateApp();
 	}
 	private static boolean ProcessArgs(String[] args) {
 		// This instance prevents the application form running
@@ -138,15 +149,16 @@ public class Main {
 	// ####################################################
 	// # Main Class #
 	// ####################################################
-	private static final int MENU_SECTION_PLUGINS = 1;
-	private static final int MENU_SECTION_LINKS  = 2;
-	private static final int MENU_SECTION_META   = 3;
+	private static final int MENU_SECTION_PLUGINS = 0;
+	private static final int MENU_SECTION_LINKS   = 1;
+	private static final int MENU_SECTION_META    = 2;
 	
 	private Settings settings;
 	private Language language;
 	
 	private TrayIcon trayIcon;
 	private JPopupMenu trayMenu;
+	private int[] trayMenuSectionEnd;
 
 	// The PluginManager will only be valid if Main.argPluginsEnabled
 	// is true. So please make sure to check for null before usage.
@@ -158,6 +170,7 @@ public class Main {
 		
 		this.trayIcon = null;
 		this.trayMenu = null;
+		trayMenuSectionEnd = new int[] {0, 1, 2};
 		
 		this.pluginManager = null;
 	}
@@ -207,45 +220,131 @@ public class Main {
 	}
 	private void initTrayMenu() {
 		this.trayMenu = new JPopupMenu();
+		this.trayIcon.addActionListener(l -> {
+			Main.Logger.logAlert(l.toString());
+		});
 		
 		this.trayMenu.addSeparator(); // Plugins section
 		this.trayMenu.addSeparator(); // Links section
 		
 		if (this.settings.AreTrayMenuLabelsShown()) {			
-			MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
+			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
 			pluginsLabel.setEnabled(false); // make it a label
 			addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
 			
-			MenuItem linksLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
+			JMenuItem linksLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
 			linksLabel.setEnabled(false); // make it a label
 			addMenuItem(linksLabel, MENU_SECTION_LINKS);
 			
-			MenuItem metaLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
+			JMenuItem metaLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
 			metaLabel.setEnabled(false); // make it a label
 			addMenuItem(metaLabel, MENU_SECTION_META);
 		}
 		
 		// "Exit"-item
-		MenuItem exitItem = new MenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
+		JMenuItem exitItem = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
 		exitItem.addActionListener(e -> {
 			Logger.logDebugMessage("Menu.Exit-Item: I was activated!");
 			System.exit(0);
 		});
 		addMenuItem(exitItem, MENU_SECTION_META);
 		
-		addMenuItem(new MenuItem("S2.0"), 2);
-		addMenuItem(new MenuItem("S3.0"), 3);
-		addMenuItem(new MenuItem("S3.1"), 3);
-		addMenuItem(new MenuItem("S3.2"), 3);
-		addMenuItem(new MenuItem("S2.1"), 2);
-		addMenuItem(new MenuItem("S2.2"), 2);
-		addMenuItem(new MenuItem("S2.3"), 2);
-		addMenuItem(new MenuItem("S2.4"), 2);
-		addMenuItem(new MenuItem("S3.3"), 3);
+		addMenuItem(new JMenuItem("S2.0"), 1);
+		addMenuItem(new JMenuItem("S3.0"), 2);
+		addMenuItem(new JMenuItem("S3.1"), 2);
+		addMenuItem(new JMenuItem("S3.2"), 2);
+		addMenuItem(new JMenuItem("S2.1"), 1);
+		addMenuItem(new JMenuItem("S2.2"), 1);
+		addMenuItem(new JMenuItem("S2.3"), 1);
+		addMenuItem(new JMenuItem("S2.4"), 1);
+		addMenuItem(new JMenuItem("S3.3"), 2);
 		
 		// Add trayMenu to trayIcon
-		this.trayIcon.setPopupMenu(this.trayMenu);
+		//this.trayIcon.setPopupMenu(this.trayMenu);
+		//this.trayMenu.setInvoker(this.trayMenu);
+		this.trayIcon.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					
+					testmeTestos();
+					Main.this.trayMenu.show(null, e.getX(), e.getY());
+					Main.this.trayMenu.setInvoker(trayMenu);
+					//meTooLeTest();
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			
+		});
+		
+		
+		
 		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1€)");
+	}
+	private void meTooLeTest() {
+		JFrame window = new JFrame();
+		window.setBounds(0,  -10000, 0, 0);
+		window.setFocusable(true);
+		window.setAutoRequestFocus(true);
+		window.requestFocus();
+		
+		window.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				System.out.println("I'm strong window, I close le Menu");
+				trayMenu.setVisible(false);
+				window.dispose();
+			}
+			
+		});
+		window.setVisible(true);
+		
+		window.requestFocus();
+		if (!window.hasFocus()) {
+			System.out.println("Nobody likes me");
+			//window.dispose();
+		}
+	}
+	private void testmeTestos() {
+		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+			@Override
+            public void eventDispatched(AWTEvent event) {
+
+                if(event instanceof MouseEvent)
+                {
+                    MouseEvent m = (MouseEvent)event;
+                    if(m.getID() == MouseEvent.MOUSE_CLICKED)
+                    {
+                        trayMenu.setVisible(false);
+                        Toolkit.getDefaultToolkit().removeAWTEventListener(this);
+                    }
+                }
+                if(event instanceof WindowEvent)
+                {
+                    WindowEvent we = (WindowEvent)event;
+                    if(we.getID() == WindowEvent.WINDOW_DEACTIVATED || we.getID() == WindowEvent.WINDOW_STATE_CHANGED)
+                    {
+                    	trayMenu.setVisible(false);
+                        Toolkit.getDefaultToolkit().removeAWTEventListener(this);
+                    }
+                }
+            }
+
+        }, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.WINDOW_EVENT_MASK);
+		//TODO test other event masks
 	}
 	private void initPluginManager() {
 		if (!ArePluginsEnabled)
@@ -254,8 +353,8 @@ public class Main {
 		this.pluginManager = new PluginManager(Logger);
 		
 		this.pluginManager.initPlugins();
-		List<MenuItem> pluginItems = this.pluginManager.getPluginMenuElements();
-		for (MenuItem menuItem : pluginItems) {
+		List<JMenuItem> pluginItems = this.pluginManager.getPluginMenuElements();
+		for (JMenuItem menuItem : pluginItems) {
 			addMenuItem(menuItem, MENU_SECTION_PLUGINS);
 		}
 	}
@@ -280,30 +379,22 @@ public class Main {
 	// ##########################################
 	// # Add MenuItems
 	// ##########################################
-	// This method adds the @MenuItem at the end of the section
-	// A new section starts with a separator
+	// This method adds the @JMenuItem at the end of the section.
+	// A new section starts with a separator.
 	private void addMenuItem(JMenuItem item, int sectionNo) {
-		int sectionEnd = getSeparatorIndex(sectionNo);
-		this.trayMenu.insert(item, sectionEnd);
-	}
-	private int getSeparatorIndex(int separatorNo) {
-		// Loop through the items
-		MenuElement[] elements = this.trayMenu.getComponent();
-		int itemCount = elements.length;
-		int separatorCount = 0;
-		for (int index = 0; index < itemCount; index++) {
-			// Check if the menuItem is a Separator (The label is "-" for separators)
-			Component item = this.trayMenu.getComponent(index);
-			if (!item.getLabel().equals("-")) {
-				continue;
-			}
-			
-			separatorCount++;
-			if (separatorCount == separatorNo) {
-				return index; // Return the index if the right section has ended
-			}
+		// Validation
+		if (sectionNo < 0 || sectionNo >= this.trayMenuSectionEnd.length) {
+			sectionNo = ((sectionNo < 0) ? 
+					0 : 
+					this.trayMenuSectionEnd.length - 1);
 		}
 		
-		return itemCount;
+		// Add the item
+		this.trayMenu.insert(item, this.trayMenuSectionEnd[sectionNo]);
+		
+		// Count this and all following indices up
+		for (int index = sectionNo; index < this.trayMenuSectionEnd.length; index++) {
+			this.trayMenuSectionEnd[index]++;
+		}
 	}
 }

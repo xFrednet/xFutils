@@ -328,8 +328,8 @@ public class PluginManager {
 		this.plugins.clear();
 	}
 
-	public List<MenuItem> getPluginMenuElements() {
-		List<MenuItem> menuItemList = new ArrayList<>(plugins.size());
+	public List<JMenuItem> getPluginMenuElements() {
+		List<JMenuItem> menuItemList = new ArrayList<>(plugins.size());
 		
 		for (IPlugin plugin : this.plugins) {
 			menuItemList.add(plugin.getSystemTrayMenu());
