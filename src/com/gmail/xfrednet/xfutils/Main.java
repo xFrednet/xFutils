@@ -4,33 +4,17 @@ import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
-import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Event;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.SystemTray;
-import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.event.AWTEventListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.io.File;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JWindow;
-import javax.swing.MenuElement;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -300,6 +284,10 @@ public class Main {
 	}
 	// TODO initLinkManager
 	
+	// ##########################################
+	// # TrayMenu stuff and things
+	// ##########################################
+	
 	private void showTrayMenu(int x, int y) {
 		// So the following, the TrayIcon does not work well with
 		// a JPopupMenu, and with not well I mean not at all. The main problem
@@ -340,26 +328,6 @@ public class Main {
 		// So, am I proud of this code, well I'm proud I found a well 
 		// working solution for my problem
 	}
-	
-	// ##########################################
-	// # terminate
-	// ##########################################
-	private void terminate() {
-		if (this.pluginManager != null) {
-			this.pluginManager.terminatePlugins();
-			this.pluginManager = null;
-			Logger.logInfo("Main.terminate: Terminated the PluginManager instance.");
-		}
-		
-		this.trayIcon = null;
-		// The TrayIcon will removed automatically by the SystenmTray.
-		// Calling the remove function from the ShutdownHook causes the 
-		// Application to idle until the end of dawn.
-	}
-
-	// ##########################################
-	// # Add MenuItems
-	// ##########################################
 	// This method adds the @JMenuItem at the end of the section.
 	// A new section starts with a separator.
 	private void addMenuItem(JMenuItem item, int sectionNo) {
@@ -377,5 +345,26 @@ public class Main {
 		for (int index = sectionNo; index < this.trayMenuSectionEnd.length; index++) {
 			this.trayMenuSectionEnd[index]++;
 		}
+	}
+	
+	// ##########################################
+	// # terminate
+	// ##########################################
+	private void terminate() {
+		if (this.trayMenu.isVisible()) {
+			this.trayMenu.setVisible(false);
+		}
+		this.trayMenu = null;
+		
+		if (this.pluginManager != null) {
+			this.pluginManager.terminatePlugins();
+			this.pluginManager = null;
+			Logger.logInfo("Main.terminate: Terminated the PluginManager instance.");
+		}
+		
+		this.trayIcon = null;
+		// The TrayIcon will removed automatically by the SystenmTray.
+		// Calling the remove function from the ShutdownHook causes the 
+		// Application to idle until the end of dawn.
 	}
 }
