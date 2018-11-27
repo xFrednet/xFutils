@@ -5,14 +5,18 @@ import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.io.File;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.Language;
@@ -23,8 +27,8 @@ public class Main {
 	
 	public static Logger  Logger             = null;
 	public static boolean IsDebugEnabled     = false;
-	public static boolean ArePluginsEnabled  = false;
-	public static boolean AreLinksEnabled    = false;
+	public static boolean ArePluginsEnabled  = true;
+	public static boolean AreLinksEnabled    = true;
 	
 	// This value should only be used by the TerminateApp function
 	private static Main instance             = null;
@@ -44,11 +48,6 @@ public class Main {
 			System.exit(1); // TODO create predefined errors
 		}
 		
-		File link = new File("link.lnk");
-		boolean ex = link.exists();
-		boolean canEx = link.canExecute();
-		
-		
 		// Add ShutdownHook to make sure everything terminates correctly
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -56,8 +55,6 @@ public class Main {
 				Main.TerminateApp();
 			}
 		});
-		
-		TerminateApp();
 	}
 	private static boolean ProcessArgs(String[] args) {
 		// This instance prevents the application form running
@@ -139,15 +136,16 @@ public class Main {
 	// ####################################################
 	// # Main Class #
 	// ####################################################
-	private static final int MENU_SECTION_PLUGINS = 1;
-	private static final int MENU_SECTION_LINKS  = 2;
-	private static final int MENU_SECTION_META   = 3;
+	private static final int MENU_SECTION_PLUGINS = 0;
+	private static final int MENU_SECTION_LINKS   = 1;
+	private static final int MENU_SECTION_META    = 2;
 	
 	private Settings settings;
 	private Language language;
 	
 	private TrayIcon trayIcon;
-	private PopupMenu trayMenu;
+	private JPopupMenu trayMenu;
+	private int[] trayMenuSectionEnd;
 
 	// The PluginManager will only be valid if Main.argPluginsEnabled
 	// is true. So please make sure to check for null before usage.
@@ -159,6 +157,7 @@ public class Main {
 		
 		this.trayIcon = null;
 		this.trayMenu = null;
+		trayMenuSectionEnd = new int[] {0, 1, 2};
 		
 		this.pluginManager = null;
 	}
@@ -207,47 +206,70 @@ public class Main {
 		return true;
 	}
 	private void initTrayMenu() {
-		this.trayMenu = new PopupMenu();
+		this.trayMenu = new JPopupMenu();
+		this.trayIcon.addActionListener(l -> {
+			Main.Logger.logAlert(l.toString());
+		});
 		
 		this.trayMenu.addSeparator(); // Plugins section
 		this.trayMenu.addSeparator(); // Links section
 		
 		if (this.settings.AreTrayMenuLabelsShown()) {			
-			MenuItem pluginsLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
+			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
 			pluginsLabel.setEnabled(false); // make it a label
 			addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
 			
-			MenuItem linksLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
+			JMenuItem linksLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
 			linksLabel.setEnabled(false); // make it a label
 			addMenuItem(linksLabel, MENU_SECTION_LINKS);
 			
-			MenuItem metaLabel = new MenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
+			JMenuItem metaLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
 			metaLabel.setEnabled(false); // make it a label
 			addMenuItem(metaLabel, MENU_SECTION_META);
 		}
 		
 		// "Exit"-item
-		MenuItem exitItem = new MenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
+		JMenuItem exitItem = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
 		exitItem.addActionListener(e -> {
 			Logger.logDebugMessage("Menu.Exit-Item: I was activated!");
 			System.exit(0);
 		});
 		addMenuItem(exitItem, MENU_SECTION_META);
 		
-		addMenuItem(new MenuItem("S2.0"), 2);
-		addMenuItem(new MenuItem("S3.0"), 3);
-		addMenuItem(new MenuItem("S3.1"), 3);
-		addMenuItem(new MenuItem("S3.2"), 3);
-		addMenuItem(new MenuItem("S2.1"), 2);
-		addMenuItem(new MenuItem("S2.2"), 2);
-		addMenuItem(new MenuItem("S2.3"), 2);
-		addMenuItem(new MenuItem("S2.4"), 2);
-		addMenuItem(new MenuItem("S3.3"), 3);
+		addMenuItem(new JMenuItem("S2.0"), 1);
+		addMenuItem(new JMenuItem("S3.0"), 2);
+		addMenuItem(new JMenuItem("S3.1"), 2);
+		addMenuItem(new JMenuItem("S3.2"), 2);
+		addMenuItem(new JMenuItem("S2.1"), 1);
+		addMenuItem(new JMenuItem("S2.2"), 1);
+		addMenuItem(new JMenuItem("S2.3"), 1);
+		addMenuItem(new JMenuItem("S2.4"), 1);
+		addMenuItem(new JMenuItem("S3.3"), 2);
 		
 		// Add trayMenu to trayIcon
-		this.trayIcon.setPopupMenu(this.trayMenu);
+		this.trayIcon.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					Main.this.showTrayMenu(e.getX(), e.getY());
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			
+		});
+		
 		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1€)");
 	}
+
 	private void initPluginManager() {
 		if (!ArePluginsEnabled)
 			return;
@@ -255,17 +277,85 @@ public class Main {
 		this.pluginManager = new PluginManager(Logger);
 		
 		this.pluginManager.initPlugins();
-		List<MenuItem> pluginItems = this.pluginManager.getPluginMenuElements();
-		for (MenuItem menuItem : pluginItems) {
+		List<JMenuItem> pluginItems = this.pluginManager.getPluginMenuElements();
+		for (JMenuItem menuItem : pluginItems) {
 			addMenuItem(menuItem, MENU_SECTION_PLUGINS);
 		}
 	}
 	// TODO initLinkManager
 	
 	// ##########################################
+	// # TrayMenu stuff and things
+	// ##########################################
+	
+	private void showTrayMenu(int x, int y) {
+		// So the following, the TrayIcon does not work well with
+		// a JPopupMenu, and with not well I mean not at all. The main problem
+		// is that menu woun't close it self.
+		// So what did I do? well I create a JFrame without any decoration, that has a 
+		// alpha value of 0. The JPopupMenu, now behaves like a good boy, the only problem
+		// is disposing the frame after the JPopupMenu is done. The easy fix? Add a 
+		// PopupMenuListener that disposes the frame when the menu goes invisible
+		
+		// Create the frame
+		JFrame frame = new JFrame();
+		frame.setFocusable(true);
+		frame.setBounds(x, y, 10, 10);
+		frame.setUndecorated(true);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setAlwaysOnTop(true);
+		frame.setVisible(true);
+		frame.setOpacity(0.0f);
+		
+		// Show the menu
+		// The x and y values for the tray menu are now frame relative
+		this.trayMenu.show(frame, 0, 0);
+		this.trayMenu.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				Main.Logger.logDebugMessage("trayMenu.PopupMenuListener: The menu will become invisible, the frame will be disposed");
+				frame.dispose();
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {}
+		});
+		Main.Logger.logInfo("showTrayMenu: The trayMenu should be visible now!");
+		
+		// So, am I proud of this code, well I'm proud I found a well 
+		// working solution for my problem
+	}
+	// This method adds the @JMenuItem at the end of the section.
+	// A new section starts with a separator.
+	private void addMenuItem(JMenuItem item, int sectionNo) {
+		// Validation
+		if (sectionNo < 0 || sectionNo >= this.trayMenuSectionEnd.length) {
+			sectionNo = ((sectionNo < 0) ? 
+					0 : 
+					this.trayMenuSectionEnd.length - 1);
+		}
+		
+		// Add the item
+		this.trayMenu.insert(item, this.trayMenuSectionEnd[sectionNo]);
+		
+		// Count this and all following indices up
+		for (int index = sectionNo; index < this.trayMenuSectionEnd.length; index++) {
+			this.trayMenuSectionEnd[index]++;
+		}
+	}
+	
+	// ##########################################
 	// # terminate
 	// ##########################################
 	private void terminate() {
+		if (this.trayMenu.isVisible()) {
+			this.trayMenu.setVisible(false);
+		}
+		this.trayMenu = null;
+		
 		if (this.pluginManager != null) {
 			this.pluginManager.terminatePlugins();
 			this.pluginManager = null;
@@ -276,34 +366,5 @@ public class Main {
 		// The TrayIcon will removed automatically by the SystenmTray.
 		// Calling the remove function from the ShutdownHook causes the 
 		// Application to idle until the end of dawn.
-	}
-
-	// ##########################################
-	// # Add MenuItems
-	// ##########################################
-	// This method adds the @MenuItem at the end of the section
-	// A new section starts with a separator
-	private void addMenuItem(MenuItem item, int sectionNo) {
-		int sectionEnd = getSeparatorIndex(sectionNo);
-		this.trayMenu.insert(item, sectionEnd);
-	}
-	private int getSeparatorIndex(int separatorNo) {
-		// Loop through the items
-		int itemCount = this.trayMenu.getItemCount();
-		int separatorCount = 0;
-		for (int index = 0; index < itemCount; index++) {
-			// Check if the menuItem is a Separator (The label is "-" for separators)
-			MenuItem item = this.trayMenu.getItem(index);
-			if (!item.getLabel().equals("-")) {
-				continue;
-			}
-			
-			separatorCount++;
-			if (separatorCount == separatorNo) {
-				return index; // Return the index if the right section has ended
-			}
-		}
-		
-		return itemCount;
 	}
 }
