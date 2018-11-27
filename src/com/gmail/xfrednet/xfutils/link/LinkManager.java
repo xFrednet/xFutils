@@ -2,6 +2,7 @@ package com.gmail.xfrednet.xfutils.link;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -13,15 +14,8 @@ public class LinkManager {
 	private static final String LINK_DIR    = "links\\";
 	static final String LINK_SUFFIX = ".lnk";
 	
-	// The current link files
-	File[] linkFiles;
-	
-	public LinkManager() {
-		linkFiles = null;
-	}
-	
 	public boolean init() {
-		if (Main.AreLinksEnabled)
+		if (!Main.AreLinksEnabled)
 			return false;
 		
 		if (!linkDirectoryValidation()) {
@@ -90,11 +84,11 @@ public class LinkManager {
 			
 			return item;
 		}
-		
+
+		// TODO add a Icon preview
+		// Create Item and an ActionListener
 		JMenuItem item = new JMenuItem(menuLabel);
-		item.addItemListener(l -> {
-			System.out.println("LinkManager.createMenuItemFromFile: " + l.getStateChange() + " " + menuLabel);
-		});;
+		item.addActionListener(l -> StartLink(itemFile));
 		
 		return item;
 	}
@@ -104,6 +98,17 @@ public class LinkManager {
 			return file.getName().substring(0, file.getName().length() - LINK_SUFFIX.length());
 		
 		return file.getName();
+	}
+	private static void StartLink(File linkFile) {
+		if (!linkFile.exists())
+			return;
+
+		try {
+			new ProcessBuilder("cmd", "/c", linkFile.getAbsolutePath()).start();
+			Main.Logger.logInfo("LinkManager.StartLink: Started the file: " + linkFile.getAbsolutePath());
+		} catch (IOException e) {
+			Main.Logger.logError("LinkManager.StartLink: Unable to start the Process, the following Error occurred", e);
+		}
 	}
 }
 
