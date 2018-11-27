@@ -5,6 +5,7 @@ import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
 
 import java.awt.AWTEvent;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Event;
 import java.awt.Image;
@@ -30,6 +31,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JWindow;
 import javax.swing.MenuElement;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.Language;
@@ -260,10 +263,7 @@ public class Main {
 		addMenuItem(new JMenuItem("S3.3"), 2);
 		
 		// Add trayMenu to trayIcon
-		//this.trayIcon.setPopupMenu(this.trayMenu);
-		//this.trayMenu.setInvoker(this.trayMenu);
 		this.trayIcon.addMouseListener(new MouseListener() {
-
 			@Override
 			public void mouseClicked(MouseEvent e) {}
 			@Override
@@ -272,11 +272,7 @@ public class Main {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					
-					testmeTestos();
-					Main.this.trayMenu.show(null, e.getX(), e.getY());
-					Main.this.trayMenu.setInvoker(trayMenu);
-					//meTooLeTest();
+					Main.this.showTrayMenu(e.getX(), e.getY());
 				}
 			}
 
@@ -287,65 +283,9 @@ public class Main {
 			
 		});
 		
-		
-		
 		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1€)");
 	}
-	private void meTooLeTest() {
-		JFrame window = new JFrame();
-		window.setBounds(0,  -10000, 0, 0);
-		window.setFocusable(true);
-		window.setAutoRequestFocus(true);
-		window.requestFocus();
-		
-		window.addFocusListener(new FocusListener() {
-			@Override
-			public void focusGained(FocusEvent e) {}
 
-			@Override
-			public void focusLost(FocusEvent e) {
-				System.out.println("I'm strong window, I close le Menu");
-				trayMenu.setVisible(false);
-				window.dispose();
-			}
-			
-		});
-		window.setVisible(true);
-		
-		window.requestFocus();
-		if (!window.hasFocus()) {
-			System.out.println("Nobody likes me");
-			//window.dispose();
-		}
-	}
-	private void testmeTestos() {
-		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-			@Override
-            public void eventDispatched(AWTEvent event) {
-
-                if(event instanceof MouseEvent)
-                {
-                    MouseEvent m = (MouseEvent)event;
-                    if(m.getID() == MouseEvent.MOUSE_CLICKED)
-                    {
-                        trayMenu.setVisible(false);
-                        Toolkit.getDefaultToolkit().removeAWTEventListener(this);
-                    }
-                }
-                if(event instanceof WindowEvent)
-                {
-                    WindowEvent we = (WindowEvent)event;
-                    if(we.getID() == WindowEvent.WINDOW_DEACTIVATED || we.getID() == WindowEvent.WINDOW_STATE_CHANGED)
-                    {
-                    	trayMenu.setVisible(false);
-                        Toolkit.getDefaultToolkit().removeAWTEventListener(this);
-                    }
-                }
-            }
-
-        }, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.WINDOW_EVENT_MASK);
-		//TODO test other event masks
-	}
 	private void initPluginManager() {
 		if (!ArePluginsEnabled)
 			return;
@@ -359,6 +299,47 @@ public class Main {
 		}
 	}
 	// TODO initLinkManager
+	
+	private void showTrayMenu(int x, int y) {
+		// So the following, the TrayIcon does not work well with
+		// a JPopupMenu, and with not well I mean not at all. The main problem
+		// is that menu woun't close it self.
+		// So what did I do? well I create a JFrame without any decoration, that has a 
+		// alpha value of 0. The JPopupMenu, now behaves like a good boy, the only problem
+		// is disposing the frame after the JPopupMenu is done. The easy fix? Add a 
+		// PopupMenuListener that disposes the frame when the menu goes invisible
+		
+		// Create the frame
+		JFrame frame = new JFrame();
+		frame.setFocusable(true);
+		frame.setBounds(x, y, 10, 10);
+		frame.setUndecorated(true);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setAlwaysOnTop(true);
+		frame.setVisible(true);
+		frame.setOpacity(0.0f);
+		
+		// Show the menu
+		// The x and y values for the tray menu are now frame relative
+		this.trayMenu.show(frame, 0, 0);
+		this.trayMenu.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				Main.Logger.logDebugMessage("trayMenu.PopupMenuListener: The menu will become invisible, the frame will be disposed");
+				frame.dispose();
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {}
+		});
+		Main.Logger.logInfo("showTrayMenu: The trayMenu should be visible now!");
+		
+		// So, am I proud of this code, well I'm proud I found a well 
+		// working solution for my problem
+	}
 	
 	// ##########################################
 	// # terminate
