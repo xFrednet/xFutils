@@ -28,12 +28,8 @@ public class LinkManager {
 	public boolean init() {
 		if (!Main.AreLinksEnabled)
 			return false;
-		
-		if (!linkDirectoryValidation()) {
-			return false;
-		}
-		
-		return true;
+
+		return linkDirectoryValidation();
 	}
 	private boolean linkDirectoryValidation() {
 		File linkDir = new File(LINK_DIR);
@@ -70,10 +66,10 @@ public class LinkManager {
 		// Value creation
 		File linkDir = new File(LINK_DIR);
 		File[] validFiles = linkDir.listFiles(new LinkManagerFileFilter());
-		JMenuItem[] menuItems = new JMenuItem[validFiles.length];
+		JMenuItem[] menuItems = new JMenuItem[(validFiles != null) ? validFiles.length : 0];
 		
 		// Create a MenuItem for every valid file
-		for (int itemIndex = 0; itemIndex < validFiles.length; itemIndex++) {
+		for (int itemIndex = 0; itemIndex < menuItems.length; itemIndex++) {
 			menuItems[itemIndex] = createMenuItemFromFile(validFiles[itemIndex]);
 		}
 		
@@ -91,10 +87,12 @@ public class LinkManager {
 			
 			// Add items for all valid files
 			File[] validFiles = itemFile.listFiles(new LinkManagerFileFilter());
-			for (File file : validFiles) {
-				item.add(createMenuItemFromFile(file));
+			if (validFiles != null) {
+				for (File file : validFiles) {
+					item.add(createMenuItemFromFile(file));
+				}
 			}
-			
+
 			return item;
 		}
 
@@ -116,12 +114,14 @@ public class LinkManager {
 	private static Icon LoadFileIcon(File file) {
 		try {
 			// Load the icon
-			Image loadedImage = ShellFolder.getShellFolder(file).getIcon(true);
+			ShellFolder shellFolder = ShellFolder.getShellFolder(file);
+
+			Image loadedImage = shellFolder.getIcon(true);
 			int loadedWidth = loadedImage.getWidth(null);
 			int loadedHeight = loadedImage.getHeight(null);
 			
 			// resize the icon if it has the wrong size
-			Image iconImage = null;
+			Image iconImage;
 			if (loadedWidth == MENU_ICON_SIZE && 
 					loadedHeight == MENU_ICON_SIZE) {
 				iconImage = loadedImage;
@@ -177,11 +177,9 @@ class LinkManagerFileFilter implements FileFilter {
 			return true;
 		
 		// Test if the file is a windows link file
-		if (file.getName().toLowerCase().endsWith(LinkManager.LINK_SUFFIX)) 
-			return true;
+		return file.getName().toLowerCase().endsWith(LinkManager.LINK_SUFFIX);
 		
 		// TOD0 maybe add a general "file.canExecute" or the link type of other OS's
-		return false;
 	}
 	
 }

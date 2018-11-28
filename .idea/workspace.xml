@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ddba1433-de36-4913-8ee2-ec4d9ee5ffae" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/link/LinkManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/link/LinkManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/xFutils.iml" beforeDir="false" afterPath="$PROJECT_DIR$/xFutils.iml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -24,30 +23,30 @@
           <entry key="project.open.time.12" value="2" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.open.time.8" value="4" />
-          <entry key="project.opened" value="10" />
+          <entry key="project.open.time.8" value="5" />
+          <entry key="project.opened" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="6" />
-          <entry key="java" value="8816" />
+          <entry key="java" value="9083" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="8816" />
+          <entry key="JAVA" value="9083" />
           <entry key="PLAIN_TEXT" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="java" value="9" />
+          <entry key="java" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="9" />
+          <entry key="JAVA" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.spring.boot.mvc.usages" />
@@ -61,13 +60,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="246" column="45" selection-start-line="246" selection-start-column="45" selection-end-line="246" selection-end-column="45" />
+            <state relative-caret-position="1159">
+              <caret line="242" column="49" lean-forward="true" selection-start-line="242" selection-start-column="49" selection-end-line="242" selection-end-column="49" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Main#0;class#Main#0" expanded="true" />
                 <element signature="method#init#0;class#Main#0" expanded="true" />
-                <element signature="e#7388#7480#0" expanded="true" />
                 <element signature="method#initPluginManager#0;class#Main#0" expanded="true" />
                 <element signature="method#initLinkManager#0;class#Main#0" expanded="true" />
               </folding>
@@ -75,14 +73,39 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/link/LinkManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="428">
-              <caret line="87" column="34" selection-start-line="87" selection-start-column="34" selection-end-line="87" selection-end-column="34" />
+            <state relative-caret-position="-835">
+              <caret line="107" column="13" lean-forward="true" selection-start-line="107" selection-start-column="13" selection-end-line="107" selection-end-column="13" />
               <folding>
                 <element signature="method#init#0;class#LinkManager#0" expanded="true" />
+                <element signature="method#getMenuItems#0;class#LinkManager#0" expanded="true" />
+                <element signature="method#createMenuItemFromFile#0;class#LinkManager#0" expanded="true" />
+                <element signature="method#LoadFileIcon#0;class#LinkManager#0" expanded="true" />
                 <element signature="method#StartLink#0;class#LinkManager#0" expanded="true" />
+                <element signature="method#accept#0;class#LinkManagerFileFilter#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="340" column="5" selection-start-line="340" selection-start-column="5" selection-end-line="340" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#PluginManager#0;class#PluginManager#0" expanded="true" />
+                <element signature="method#initPlugins#0;class#PluginManager#0" expanded="true" />
+                <element signature="e#2524#2557#0" expanded="true" />
+                <element signature="method#loadPlugins#0;class#PluginManager#0" expanded="true" />
+                <element signature="method#GetInterfaceClass#0;class#PluginManager#0" expanded="true" />
+                <element signature="method#getAvailablePlugins#0;class#PluginManager#0" expanded="true" />
+                <element signature="method#validatePluginDir#0;class#PluginManager#0" expanded="true" />
+                <element signature="method#saveEnabledPluginNames#0;class#PluginManager#0" expanded="true" />
+                <element signature="method#accept#0;class#PluginFileFilter#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -115,9 +138,9 @@
         <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/util/logger/ConsoleLogger.java" />
         <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/IPlugin.java" />
         <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/util/Logger.java" />
-        <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java" />
         <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/Main.java" />
         <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/link/LinkManager.java" />
+        <option value="$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java" />
       </list>
     </option>
   </component>
@@ -151,7 +174,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
@@ -189,6 +211,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -198,7 +221,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543343959161" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543433748721" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -253,17 +276,18 @@
       <workItem from="1541836744050" duration="11045000" />
       <workItem from="1541936828626" duration="1851000" />
       <workItem from="1543338770920" duration="5174000" />
+      <workItem from="1543424158498" duration="2894000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="46539000" />
+    <option name="totallyTimeSpent" value="49433000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="22" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.47362638" visible="true" weight="0.2739872" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.47362638" visible="true" weight="0.2771855" />
       <window_info id="Image Layers" order="1" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -271,7 +295,7 @@
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32967034" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32967034" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.23406594" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -280,7 +304,7 @@
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32967034" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" order="11" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32967034" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -290,7 +314,7 @@
       <window_info anchor="right" id="Theme Preview" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="right" id="Maven Projects" order="8" />
-      <window_info anchor="right" id="Structure" order="9" sideWeight="0.5263736" visible="true" weight="0.1433902" />
+      <window_info anchor="right" id="Structure" order="9" sideWeight="0.5263736" visible="true" weight="0.15031983" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -330,27 +354,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
           <caret line="65" column="9" selection-start-line="65" selection-start-column="9" selection-end-line="65" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#logError#0;class#Logger#0" expanded="true" />
-            <element signature="method#logError#1;class#Logger#0" expanded="true" />
-            <element signature="method#logAlert#0;class#Logger#0" expanded="true" />
-            <element signature="method#logAlert#1;class#Logger#0" expanded="true" />
-            <element signature="method#logInfo#0;class#Logger#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-119">
-          <caret line="200" column="38" lean-forward="true" selection-start-line="200" selection-start-column="38" selection-end-line="200" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#PluginManager#0;class#PluginManager#0" expanded="true" />
-            <element signature="method#initPlugins#0;class#PluginManager#0" expanded="true" />
-            <element signature="method#accept#0;class#PluginFileFilter#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -366,26 +369,55 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="246" column="45" selection-start-line="246" selection-start-column="45" selection-end-line="246" selection-end-column="45" />
+        <state relative-caret-position="1159">
+          <caret line="242" column="49" lean-forward="true" selection-start-line="242" selection-start-column="49" selection-end-line="242" selection-end-column="49" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Main#0;class#Main#0" expanded="true" />
             <element signature="method#init#0;class#Main#0" expanded="true" />
-            <element signature="e#7388#7480#0" expanded="true" />
             <element signature="method#initPluginManager#0;class#Main#0" expanded="true" />
             <element signature="method#initLinkManager#0;class#Main#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/io/File.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="1293" column="23" lean-forward="true" selection-start-line="1293" selection-start-column="23" selection-end-line="1293" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/link/LinkManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
-          <caret line="87" column="34" selection-start-line="87" selection-start-column="34" selection-end-line="87" selection-end-column="34" />
+        <state relative-caret-position="-835">
+          <caret line="107" column="13" lean-forward="true" selection-start-line="107" selection-start-column="13" selection-end-line="107" selection-end-column="13" />
           <folding>
             <element signature="method#init#0;class#LinkManager#0" expanded="true" />
+            <element signature="method#getMenuItems#0;class#LinkManager#0" expanded="true" />
+            <element signature="method#createMenuItemFromFile#0;class#LinkManager#0" expanded="true" />
+            <element signature="method#LoadFileIcon#0;class#LinkManager#0" expanded="true" />
             <element signature="method#StartLink#0;class#LinkManager#0" expanded="true" />
+            <element signature="method#accept#0;class#LinkManagerFileFilter#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/gmail/xfrednet/xfutils/plugin/PluginManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="340" column="5" selection-start-line="340" selection-start-column="5" selection-end-line="340" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#PluginManager#0;class#PluginManager#0" expanded="true" />
+            <element signature="method#initPlugins#0;class#PluginManager#0" expanded="true" />
+            <element signature="e#2524#2557#0" expanded="true" />
+            <element signature="method#loadPlugins#0;class#PluginManager#0" expanded="true" />
+            <element signature="method#GetInterfaceClass#0;class#PluginManager#0" expanded="true" />
+            <element signature="method#getAvailablePlugins#0;class#PluginManager#0" expanded="true" />
+            <element signature="method#validatePluginDir#0;class#PluginManager#0" expanded="true" />
+            <element signature="method#saveEnabledPluginNames#0;class#PluginManager#0" expanded="true" />
+            <element signature="method#accept#0;class#PluginFileFilter#0" expanded="true" />
           </folding>
         </state>
       </provider>

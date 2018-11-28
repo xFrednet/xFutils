@@ -242,11 +242,6 @@ public class Main {
 		});
 		addMenuItem(exitItem, MENU_SECTION_META);
 		
-		addMenuItem(new JMenuItem("S3.0"), 2);
-		addMenuItem(new JMenuItem("S3.1"), 2);
-		addMenuItem(new JMenuItem("S3.2"), 2);
-		addMenuItem(new JMenuItem("S3.3"), 2);
-		
 		// Add trayMenu to trayIcon
 		this.trayIcon.addMouseListener(new MouseListener() {
 			@Override
