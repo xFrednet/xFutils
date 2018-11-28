@@ -1,19 +1,30 @@
 package com.gmail.xfrednet.xfutils.link;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.gmail.xfrednet.xfutils.Main;
 
+import sun.awt.shell.ShellFolder;
+
 public class LinkManager {
 
 	private static final String LINK_DIR    = "links\\";
 	static final String LINK_SUFFIX = ".lnk";
+	private static final int MENU_ICON_SIZE = 32;
 	
+	// This method validates the link directory and it's right to be initialized.
+	// @returns: true if the instance is valid and can be used. 
 	public boolean init() {
 		if (!Main.AreLinksEnabled)
 			return false;
@@ -54,6 +65,7 @@ public class LinkManager {
 		return true;
 	}
 	
+	// Creates a JMenuItem for every file and folder that is inside the link directory 
 	public JMenuItem[] getMenuItems() {
 		// Value creation
 		File linkDir = new File(LINK_DIR);
@@ -75,6 +87,7 @@ public class LinkManager {
 		// valid files from that directory (if any)
 		if (itemFile.isDirectory()) {
 			JMenu item = new JMenu(menuLabel);
+			item.setIcon(LoadFileIcon(itemFile));
 			
 			// Add items for all valid files
 			File[] validFiles = itemFile.listFiles(new LinkManagerFileFilter());
@@ -88,16 +101,55 @@ public class LinkManager {
 		// TODO add a Icon preview
 		// Create Item and an ActionListener
 		JMenuItem item = new JMenuItem(menuLabel);
+		item.setIcon(LoadFileIcon(itemFile));
 		item.addActionListener(l -> StartLink(itemFile));
 		
 		return item;
 	}
 	
-	private String getMenuLabelFromFile(File file) {
+	private static String getMenuLabelFromFile(File file) {
 		if (file.getName().toLowerCase().endsWith(LinkManager.LINK_SUFFIX)) 
 			return file.getName().substring(0, file.getName().length() - LINK_SUFFIX.length());
 		
 		return file.getName();
+	}
+	private static Icon LoadFileIcon(File file) {
+		try {
+			// Load the icon
+			Image loadedImage = ShellFolder.getShellFolder(file).getIcon(true);
+			int loadedWidth = loadedImage.getWidth(null);
+			int loadedHeight = loadedImage.getHeight(null);
+			
+			// resize the icon if it has the wrong size
+			Image iconImage = null;
+			if (loadedWidth == MENU_ICON_SIZE && 
+					loadedHeight == MENU_ICON_SIZE) {
+				iconImage = loadedImage;
+			} else {
+				// A BufferedImage where the Icon is scaled on to
+				BufferedImage bufferedImage = new BufferedImage(
+						MENU_ICON_SIZE, 
+						MENU_ICON_SIZE, 
+						BufferedImage.TYPE_INT_ARGB);
+				
+				// drawing the scaled Image on the BufferedImage
+				Graphics2D g = bufferedImage.createGraphics();
+				g.drawImage(loadedImage, 
+						0, 0, MENU_ICON_SIZE, MENU_ICON_SIZE, null);
+				g.dispose();
+				
+				// set the iconImage to the BufferedImage
+				iconImage = bufferedImage;
+			}
+			
+			// Create a ImageIUcon from the image and return that icon
+			return new ImageIcon(iconImage);
+		} catch (FileNotFoundException e) {
+			Main.Logger.logAlert(
+					"LinkManager.LoadFileIcon: Unable to load the icon for the file: " + file.getAbsolutePath(), 
+					e);
+		}
+		return null;
 	}
 	private static void StartLink(File linkFile) {
 		if (!linkFile.exists())

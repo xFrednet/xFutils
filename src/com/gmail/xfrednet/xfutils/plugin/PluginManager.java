@@ -15,7 +15,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.awt.MenuItem;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -74,7 +73,7 @@ public class PluginManager {
 			}
 		}
 	}
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "rawtypes" })
 	private void loadPlugins(List<File> pluginFiles) {
 		// loop though the files
 		for (File file : pluginFiles) {
@@ -97,6 +96,7 @@ public class PluginManager {
 			}
 		}
 	}
+	@SuppressWarnings({ "resource", "rawtypes" })
 	static Class GetInterfaceClass(File file) {
 		// Creates JarFile object and finds it's main class
 		try {
