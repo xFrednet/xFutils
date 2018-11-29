@@ -11,6 +11,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+import javax.swing.JMenu;
+
 import com.gmail.xfrednet.xfutils.Main;
 
 public class Settings {
@@ -28,6 +30,7 @@ public class Settings {
 	
 	private boolean showTrayMenuLabels;
 	private String language;
+	// TODO add scale option
 	
 	public Settings() {
 		reset();
@@ -100,7 +103,18 @@ public class Settings {
 		return true;
 	}
 	
-	// TODO UI implementation
+	public JMenu getSettingsMenu() {
+		JMenu settingsMenu = new JMenu();
+		
+		// showTrayMenuLabels
+		
+		// language
+		
+		// reset
+		
+		// return
+		return settingsMenu;
+	}
 	
 	public boolean AreTrayMenuLabelsShown() {
 		return this.showTrayMenuLabels;
