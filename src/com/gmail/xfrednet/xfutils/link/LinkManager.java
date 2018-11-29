@@ -1,5 +1,6 @@
 package com.gmail.xfrednet.xfutils.link;
 
+import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -14,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.gmail.xfrednet.xfutils.Main;
+import com.gmail.xfrednet.xfutils.util.Language;
 
 import sun.awt.shell.ShellFolder;
 
@@ -23,12 +25,16 @@ public class LinkManager {
 	static final String LINK_SUFFIX = ".lnk";
 	private static final int MENU_ICON_SIZE = 32;
 	
+	private Language language;
+	
 	// This method validates the link directory and it's right to be initialized.
 	// @returns: true if the instance is valid and can be used. 
-	public boolean init() {
+	public boolean init(Language language) {
 		if (!Main.AreLinksEnabled)
 			return false;
-
+			
+		this.language = language;
+		
 		return linkDirectoryValidation();
 	}
 	private boolean linkDirectoryValidation() {
@@ -66,15 +72,31 @@ public class LinkManager {
 		// Value creation
 		File linkDir = new File(LINK_DIR);
 		File[] validFiles = linkDir.listFiles(new LinkManagerFileFilter());
-		JMenuItem[] menuItems = new JMenuItem[(validFiles != null) ? validFiles.length : 0];
+		JMenuItem[] menuItems = new JMenuItem[((validFiles != null) ? validFiles.length : 0) + 1];
 		
 		// Create a MenuItem for every valid file
-		for (int itemIndex = 0; itemIndex < menuItems.length; itemIndex++) {
+		for (int itemIndex = 0; itemIndex < menuItems.length - 1; itemIndex++) {
 			menuItems[itemIndex] = createMenuItemFromFile(validFiles[itemIndex]);
 		}
 		
+		menuItems[menuItems.length - 1] = createAddLinkMenu();
+		
 		// return the MenuItems
 		return menuItems;
+	}
+	private JMenuItem createAddLinkMenu() {
+		JMenuItem addLinkMenu = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_ADD_LINK));
+		
+		// Open in explorer
+		addLinkMenu.addActionListener(l -> {
+			try {
+				Desktop.getDesktop().open(new File(LINK_DIR));
+			} catch (IOException e) {
+				Main.Logger.logError("LinkManager[AddLink-Item]: Unable to open the link-directory", e);
+			}
+		});
+		
+		return addLinkMenu;
 	}
 	private JMenuItem createMenuItemFromFile(File itemFile) {
 		String menuLabel = getMenuLabelFromFile(itemFile);
@@ -87,10 +109,12 @@ public class LinkManager {
 			
 			// Add items for all valid files
 			File[] validFiles = itemFile.listFiles(new LinkManagerFileFilter());
-			if (validFiles != null) {
+			if (validFiles != null && validFiles.length != 0) {
 				for (File file : validFiles) {
 					item.add(createMenuItemFromFile(file));
 				}
+			} else {
+				item.add(this.language.getString(Language.Keys.MENU_ITEM_EMPTY));
 			}
 
 			return item;
@@ -115,7 +139,6 @@ public class LinkManager {
 		try {
 			// Load the icon
 			ShellFolder shellFolder = ShellFolder.getShellFolder(file);
-
 			Image loadedImage = shellFolder.getIcon(true);
 			int loadedWidth = loadedImage.getWidth(null);
 			int loadedHeight = loadedImage.getHeight(null);

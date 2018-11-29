@@ -286,7 +286,7 @@ public class Main {
 
 		// create and init the LinkManager
 		this.linkManager = new LinkManager();
-		if (!this.linkManager.init()) {
+		if (!this.linkManager.init(this.language)) {
 			Main.Logger.logError("Main.initLinkManager: Something went wrong during the initialisation of the LinkManager");
 			this.linkManager = null;
 			return;

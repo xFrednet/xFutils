@@ -88,6 +88,8 @@ public class Language {
 		public static final String MENU_LABEL_LINKS = "menu_label_links";
 		public static final String MENU_LABEL_META = "menu_label_meta";
 		
+		public static final String MENU_ITEM_EMPTY = "menu_item_empty";
+		public static final String MENU_ITEM_ADD_LINK = "menu_item_add_link";
 		public static final String MENU_ITEM_EXIT = "menu_item_exit";
 	}
 }
