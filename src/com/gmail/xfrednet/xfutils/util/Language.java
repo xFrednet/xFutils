@@ -5,9 +5,12 @@ import java.util.ResourceBundle;
 
 import com.gmail.xfrednet.xfutils.Main;
 
+import javax.swing.*;
+
 public class Language {
 
 	private static final String RESOURCE_BUNDLE_BASE_NAME = "translations\\lang";
+	private static final String AVAILABLE_LANGUAGES = "translations\\available_languages.txt";
 	
 	public static Language Init(String langName) {
 		Language lang = new Language(langName);
@@ -53,7 +56,7 @@ public class Language {
 					RESOURCE_BUNDLE_BASE_NAME, 
 					this.localeInfo);
 			
-			Main.Logger.logInfo("Language.init: The language \"" + getString("lang_name") + "\" Successfully :)");
+			Main.Logger.logInfo("Language.init: The language \"" + getString(Keys.LANG_NAME) + "\" Successfully :)");
 			return true;
 		} catch (Exception e) {
 			Main.Logger.logAlert(
@@ -76,11 +79,15 @@ public class Language {
 	public String getLanguage() {
 		return this.language;
 	}
-	
 	public Locale getLocale() {
 		return this.localeInfo;
 	}
-	
+
+	public JMenu createSettingsMenu() {
+		JMenu menu = new JMenu(getString(Keys.SETTINGS_LANGUAGE_MENU));
+		return menu;
+	}
+
 	public class Keys {
 		public static final String LANG_NAME = "lang_name";
 		
@@ -91,5 +98,10 @@ public class Language {
 		public static final String MENU_ITEM_EMPTY = "menu_item_empty";
 		public static final String MENU_ITEM_ADD_LINK = "menu_item_add_link";
 		public static final String MENU_ITEM_EXIT = "menu_item_exit";
+
+		public static final String MENU_ITEM_SETTINGS = "menu_item_settings";
+		public static final String SETTINGS_LANGUAGE_MENU = "settings_language_menu";
+		public static final String SETTINGS_SHOW_TRAYMENU_LABELS = "settings_show_traymenu_labels";
+		public static final String SETTINGS_RESET = "settings_reset_settings";
 	}
 }

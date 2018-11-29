@@ -11,7 +11,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-import javax.swing.JMenu;
+import javax.swing.*;
 
 import com.gmail.xfrednet.xfutils.Main;
 
@@ -103,14 +103,30 @@ public class Settings {
 		return true;
 	}
 	
-	public JMenu getSettingsMenu() {
-		JMenu settingsMenu = new JMenu();
+	public JMenu getSettingsMenu(Language translation) {
+		JMenu settingsMenu = new JMenu(translation.getString(Language.Keys.MENU_ITEM_SETTINGS));
 		
 		// showTrayMenuLabels
-		
+		JCheckBoxMenuItem showLabelsItem = new JCheckBoxMenuItem(Language.Keys.SETTINGS_SHOW_TRAYMENU_LABELS);
+		showLabelsItem.setState(this.showTrayMenuLabels);
+		showLabelsItem.addActionListener(l -> {
+			// Assign new value and save the change
+			this.showTrayMenuLabels = showLabelsItem.getState();
+			save();
+		});
+		settingsMenu.add(showLabelsItem);
+
 		// language
-		
+
+
 		// reset
+		JMenuItem resetItem = new JMenuItem(translation.getString(Language.Keys.SETTINGS_RESET));
+		resetItem.addActionListener(l -> {
+			// reset and save
+			reset();
+			save();
+		});
+		settingsMenu.add(resetItem);
 		
 		// return
 		return settingsMenu;

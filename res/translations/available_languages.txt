@@ -1,0 +1,3 @@
+# Name = abbreviation
+English=en
+Deutsch=de

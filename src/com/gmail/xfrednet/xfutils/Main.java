@@ -220,7 +220,7 @@ public class Main {
 		this.trayMenu.addSeparator(); // Plugins section
 		this.trayMenu.addSeparator(); // Links section
 		
-		if (this.settings.AreTrayMenuLabelsShown()) {			
+		if (this.settings.AreTrayMenuLabelsShown()) {
 			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
 			pluginsLabel.setEnabled(false); // make it a label
 			addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
