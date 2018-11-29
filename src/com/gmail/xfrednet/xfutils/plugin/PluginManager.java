@@ -15,7 +15,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.awt.MenuItem;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -74,7 +73,7 @@ public class PluginManager {
 			}
 		}
 	}
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "rawtypes" })
 	private void loadPlugins(List<File> pluginFiles) {
 		// loop though the files
 		for (File file : pluginFiles) {
@@ -84,12 +83,12 @@ public class PluginManager {
 				Class mainClass = GetInterfaceClass(file);
 				if (mainClass == null) {
 					logger.logAlert("loadPlugins: GetInterfaceClass has failed to find the interface class");
+					throw new NullPointerException();
 				}
-				
+
 				// Initialize a new instance
 				IPlugin plugin = (IPlugin)mainClass.newInstance();
 				this.plugins.add(plugin);
-				
 			} catch (Exception e) {
 				logger.logError(
 						"loadPlugins: Something failed during the plugin loading of the Plugin: \"" + 
@@ -97,16 +96,16 @@ public class PluginManager {
 			}
 		}
 	}
+	@SuppressWarnings({ "resource", "rawtypes" })
 	static Class GetInterfaceClass(File file) {
 		// Creates JarFile object and finds it's main class
 		try {
-			// TODO What does Eclipse has against this object?
 			JarFile jarFile = new JarFile(file);
 			Manifest manifest = jarFile.getManifest();
 			String mainClassName = manifest.getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
 			
 			// Load the class
-			Class mainClass = new URLClassLoader(new URL[]{file.toURL()}).loadClass(mainClassName);
+			Class mainClass = new URLClassLoader(new URL[]{file.toURI().toURL()}).loadClass(mainClassName);
 			Class[] interfaces = mainClass.getInterfaces();
 			for (Class testInterface : interfaces) {
 				// Test if the current class is the IPlugin-Interface
@@ -165,6 +164,9 @@ public class PluginManager {
 
 		// Get the ".jar"-files
 		File[] jarFiles = pluginDir.listFiles(new PluginFileFilter());
+		if (jarFiles == null) {
+			jarFiles = new File[0];
+		}
 
 		// Debug info
 		if (logger.isDebugLogEnabled()) {
@@ -336,10 +338,6 @@ public class PluginManager {
 		}
 		
 		return menuItemList;
-	}
-
-	JPanel getSettingsPanel() {
-		return null;
 	}
 }
 

@@ -2,8 +2,6 @@ package com.gmail.xfrednet.xfutils.plugin;
 
 import com.gmail.xfrednet.xfutils.util.Logger;
 
-import java.awt.MenuItem;
-
 import javax.swing.JMenuItem;
 
 public interface IPlugin {

@@ -1,5 +1,6 @@
 package com.gmail.xfrednet.xfutils;
 
+import com.gmail.xfrednet.xfutils.link.LinkManager;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
@@ -150,6 +151,7 @@ public class Main {
 	// The PluginManager will only be valid if Main.argPluginsEnabled
 	// is true. So please make sure to check for null before usage.
 	private PluginManager pluginManager;
+	private LinkManager linkManager;
 	
 	private Main() {
 		this.settings = null;
@@ -160,6 +162,7 @@ public class Main {
 		trayMenuSectionEnd = new int[] {0, 1, 2};
 		
 		this.pluginManager = null;
+		this.linkManager = null;
 	}
 	
 	// ##########################################
@@ -201,8 +204,11 @@ public class Main {
 		
 		// init Plugins
 		initPluginManager();
+
+		// init the LinkManager
+		initLinkManager();
 		
-		// Return le trúe
+		// Return le trÃ¹e
 		return true;
 	}
 	private void initTrayMenu() {
@@ -236,16 +242,6 @@ public class Main {
 		});
 		addMenuItem(exitItem, MENU_SECTION_META);
 		
-		addMenuItem(new JMenuItem("S2.0"), 1);
-		addMenuItem(new JMenuItem("S3.0"), 2);
-		addMenuItem(new JMenuItem("S3.1"), 2);
-		addMenuItem(new JMenuItem("S3.2"), 2);
-		addMenuItem(new JMenuItem("S2.1"), 1);
-		addMenuItem(new JMenuItem("S2.2"), 1);
-		addMenuItem(new JMenuItem("S2.3"), 1);
-		addMenuItem(new JMenuItem("S2.4"), 1);
-		addMenuItem(new JMenuItem("S3.3"), 2);
-		
 		// Add trayMenu to trayIcon
 		this.trayIcon.addMouseListener(new MouseListener() {
 			@Override
@@ -267,7 +263,7 @@ public class Main {
 			
 		});
 		
-		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1€)");
+		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1ï¿½)");
 	}
 
 	private void initPluginManager() {
@@ -281,8 +277,29 @@ public class Main {
 		for (JMenuItem menuItem : pluginItems) {
 			addMenuItem(menuItem, MENU_SECTION_PLUGINS);
 		}
+
+		Main.Logger.logInfo("Main.initPluginManager: The PluginManager was successfully initialized");
 	}
-	// TODO initLinkManager
+	private void initLinkManager() {
+		if (!AreLinksEnabled)
+			return;
+
+		// create and init the LinkManager
+		this.linkManager = new LinkManager();
+		if (!this.linkManager.init(this.language)) {
+			Main.Logger.logError("Main.initLinkManager: Something went wrong during the initialisation of the LinkManager");
+			this.linkManager = null;
+			return;
+		}
+
+		// Add the JMenuItems from the LinkManager
+		JMenuItem[] linkItems = this.linkManager.getMenuItems();
+		for (JMenuItem item : linkItems) {
+			addMenuItem(item, MENU_SECTION_LINKS);
+		}
+
+		Main.Logger.logInfo("Main.initLinkManager: The LinkManager was successfully initialized");
+	}
 	
 	// ##########################################
 	// # TrayMenu stuff and things
