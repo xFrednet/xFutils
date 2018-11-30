@@ -221,6 +221,7 @@ public class Main {
 		this.trayMenu.addSeparator(); // Links section
 		
 		if (this.settings.AreTrayMenuLabelsShown()) {
+			// TODO make labels nonlocal and update labels on language change
 			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
 			pluginsLabel.setEnabled(false); // make it a label
 			addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
@@ -233,6 +234,9 @@ public class Main {
 			metaLabel.setEnabled(false); // make it a label
 			addMenuItem(metaLabel, MENU_SECTION_META);
 		}
+		
+		// Settings menu
+		addMenuItem(this.settings.getSettingsMenu(this), MENU_SECTION_META);
 		
 		// "Exit"-item
 		JMenuItem exitItem = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
@@ -383,5 +387,23 @@ public class Main {
 		// The TrayIcon will removed automatically by the SystenmTray.
 		// Calling the remove function from the ShutdownHook causes the 
 		// Application to idle until the end of dawn.
+	}
+	
+	// ##########################################
+	// # Utility
+	// ##########################################
+	public Language getLanguage() {
+		return this.language;
+	}
+	public void updateLanguage() {
+		String oldLang = this.language.getLanguage();
+		
+		// Check if the new language could be loaded
+		if (!this.language.loadResource(this.settings.getLanguage())) {
+			this.language.loadResource(oldLang);
+			return;
+		}
+		
+		this.settings.updateGUI(this.language);
 	}
 }
