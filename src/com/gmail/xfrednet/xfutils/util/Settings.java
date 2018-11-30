@@ -116,7 +116,7 @@ public class Settings {
 		this.guiSettingsMenu = new JMenu(translation.getString(Language.Keys.MENU_ITEM_SETTINGS));
 		
 		// showTrayMenuLabels
-		this.guiShowTrayMenuLabelsItem = new JCheckBoxMenuItem(Language.Keys.SETTINGS_SHOW_TRAYMENU_LABELS);
+		this.guiShowTrayMenuLabelsItem = new JCheckBoxMenuItem(translation.getString(Language.Keys.SETTINGS_SHOW_TRAYMENU_LABELS));
 		this.guiShowTrayMenuLabelsItem.setState(this.showTrayMenuLabels);
 		this.guiShowTrayMenuLabelsItem.addActionListener(l -> {
 			// Assign new value and save the change
