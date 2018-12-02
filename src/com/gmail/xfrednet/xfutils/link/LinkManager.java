@@ -165,7 +165,7 @@ public class LinkManager {
 				iconImage = bufferedImage;
 			}
 			
-			// Create a ImageIUcon from the image and return that icon
+			// Create a ImageIcon from the image and return that icon
 			return new ImageIcon(iconImage);
 		} catch (FileNotFoundException e) {
 			Main.Logger.logAlert(

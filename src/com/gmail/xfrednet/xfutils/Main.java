@@ -1,6 +1,10 @@
 package com.gmail.xfrednet.xfutils;
 
 import com.gmail.xfrednet.xfutils.link.LinkManager;
+import com.gmail.xfrednet.xfutils.plugin.PluginManager;
+import com.gmail.xfrednet.xfutils.util.Language;
+import com.gmail.xfrednet.xfutils.util.Logger;
+import com.gmail.xfrednet.xfutils.util.Settings;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
@@ -10,27 +14,28 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import com.gmail.xfrednet.xfutils.plugin.PluginManager;
-import com.gmail.xfrednet.xfutils.util.Language;
-import com.gmail.xfrednet.xfutils.util.Logger;
-import com.gmail.xfrednet.xfutils.util.Settings;
 
 public class Main {
-	
-	public static Logger  Logger             = null;
+
+	// Static resources
+	public static final Image MAIN_ICON = LoadResourceImage("icon.png");
+
+	// Static Values
+	public static Logger  Logger             = new NoLogLogger();
 	public static boolean IsDebugEnabled     = false;
 	public static boolean ArePluginsEnabled  = true;
 	public static boolean AreLinksEnabled    = true;
-	
+
 	// This value should only be used by the TerminateApp function
 	private static Main instance             = null;
 	
@@ -58,10 +63,6 @@ public class Main {
 		});
 	}
 	private static boolean ProcessArgs(String[] args) {
-		// This instance prevents the application form running
-		// into a null pointer
-		Logger = new NoLogLogger();
-		
 		for (String arg : args) {
 			switch (arg) {
 			case "-debug":
@@ -133,7 +134,25 @@ public class Main {
 			Logger = null;
 		}
 	}
-	
+
+	private static Image LoadResourceImage(String iconName) {
+		// Ask the ClassLoader for the resource URL
+		URL resURL = ClassLoader.getSystemClassLoader().getResource(iconName);
+		if (resURL == null) {
+			Logger.logError("Main. LoadResourceIcon: The ClassLoader was unable to find the icon as a resource: " + iconName);
+			return null;
+		}
+
+		// Try to load the icon
+		try {
+			return ImageIO.read(resURL);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Logger.logError("Main. LoadResourceIcon: Unable to load the icon from resource: " + iconName, e);
+			return null;
+		}
+	}
+
 	// ####################################################
 	// # Main Class #
 	// ####################################################
@@ -159,7 +178,7 @@ public class Main {
 		
 		this.trayIcon = null;
 		this.trayMenu = null;
-		trayMenuSectionEnd = new int[] {0, 1, 2};
+		this.trayMenuSectionEnd = new int[] {0, 1, 2};
 		
 		this.pluginManager = null;
 		this.linkManager = null;
@@ -189,10 +208,9 @@ public class Main {
 		
 		// Create and add TrayIcon
 		try {
-			Image icon = ImageIO.read(ClassLoader.getSystemClassLoader().getResource("icon.png"));
-			this.trayIcon = new TrayIcon(icon);
+			this.trayIcon = new TrayIcon(MAIN_ICON);
 			SystemTray.getSystemTray().add(trayIcon);
-			
+
 			Logger.logInfo("Main.init: Added the TrayIcon to the SystemTray.");
 		} catch (Exception e) {
 			Logger.logError("Main.init: Something failed during the initialization!", e);
@@ -312,40 +330,47 @@ public class Main {
 	private void showTrayMenu(int x, int y) {
 		// So the following, the TrayIcon does not work well with
 		// a JPopupMenu, and with not well I mean not at all. The main problem
-		// is that menu woun't close it self.
-		// So what did I do? well I create a JFrame without any decoration, that has a 
+		// is that menu wouldn't close it self.
+		// So what did I do? well I create a JDialog without any decoration, that has a
 		// alpha value of 0. The JPopupMenu, now behaves like a good boy, the only problem
-		// is disposing the frame after the JPopupMenu is done. The easy fix? Add a 
-		// PopupMenuListener that disposes the frame when the menu goes invisible
+		// is disposing the dialog after the JPopupMenu is done. The easy fix? Add a
+		// PopupMenuListener that disposes the dialog when the menu goes invisible
 		
-		// Create the frame
-		JFrame frame = new JFrame();
-		frame.setFocusable(true);
-		frame.setBounds(x, y, 10, 10);
-		frame.setUndecorated(true);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setAlwaysOnTop(true);
-		frame.setVisible(true);
-		frame.setOpacity(0.0f);
+		// Create the dialog
+		JDialog dialog = new JDialog();
+		dialog.setFocusable(true);
+		dialog.setBounds(x, y, 10, 10);
+		dialog.setUndecorated(true);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setAlwaysOnTop(true);
+		dialog.setVisible(true);
+		dialog.setOpacity(0.0f);
 		
 		// Show the menu
-		// The x and y values for the tray menu are now frame relative
-		this.trayMenu.show(frame, 0, 0);
+		// The x and y values for the tray menu are now dialog relative
+		this.trayMenu.show(dialog, 0, 0);
 		this.trayMenu.addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
 
 			@Override
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				Main.Logger.logDebugMessage("trayMenu.PopupMenuListener: The menu will become invisible, the frame will be disposed");
-				frame.dispose();
+				Main.Logger.logDebugMessage("trayMenu.PopupMenuListener: The menu will become invisible, the dialog will be disposed");
+				dialog.dispose();
 			}
 
 			@Override
 			public void popupMenuCanceled(PopupMenuEvent e) {}
 		});
 		Main.Logger.logInfo("showTrayMenu: The trayMenu should be visible now!");
-		
+
+		try {
+			Image icon = ImageIO.read(ImageIO.createImageInputStream(new File("res/icon.png")));
+			this.trayIcon.setImage(icon);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		// So, am I proud of this code, well I'm proud I found a well 
 		// working solution for my problem
 	}
