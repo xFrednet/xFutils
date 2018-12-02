@@ -11,6 +11,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+import javax.swing.*;
+
 import com.gmail.xfrednet.xfutils.Main;
 
 public class Settings {
@@ -29,8 +31,17 @@ public class Settings {
 	private boolean showTrayMenuLabels;
 	private String language;
 	
+	private JMenu guiSettingsMenu;
+	private JCheckBoxMenuItem guiShowTrayMenuLabelsItem;
+	private JMenuItem guiResetItem;
+	// TODO add scale option
+	
 	public Settings() {
 		reset();
+		
+		this.guiSettingsMenu = null;
+		this.guiShowTrayMenuLabelsItem = null;
+		this.guiResetItem = null;
 	}
 	
 	public void reset() {
@@ -100,7 +111,47 @@ public class Settings {
 		return true;
 	}
 	
-	// TODO UI implementation
+	public JMenu getSettingsMenu(Main main) {
+		Language translation = main.getLanguage();
+		this.guiSettingsMenu = new JMenu(translation.getString(Language.Keys.MENU_ITEM_SETTINGS));
+		
+		// showTrayMenuLabels
+		this.guiShowTrayMenuLabelsItem = new JCheckBoxMenuItem(translation.getString(Language.Keys.SETTINGS_SHOW_TRAYMENU_LABELS));
+		this.guiShowTrayMenuLabelsItem.setState(this.showTrayMenuLabels);
+		this.guiShowTrayMenuLabelsItem.addActionListener(l -> {
+			// Assign new value and save the change
+			this.showTrayMenuLabels = this.guiShowTrayMenuLabelsItem.getState();
+			save();
+		});
+		this.guiSettingsMenu.add(this.guiShowTrayMenuLabelsItem);
+
+		// language
+		this.guiSettingsMenu.add(translation.createSettingsMenu(this, main));
+
+		// reset
+		this.guiResetItem = new JMenuItem(translation.getString(Language.Keys.SETTINGS_RESET));
+		this.guiResetItem.addActionListener(l -> {
+			// reset and save
+			reset();
+			save();
+		});
+		this.guiSettingsMenu.add(this.guiResetItem);
+		
+		// return
+		return this.guiSettingsMenu;
+	}
+	public void updateGUI(Language translation) {
+		if (this.guiSettingsMenu != null) {
+			this.guiSettingsMenu.setText(translation.getString(Language.Keys.MENU_ITEM_SETTINGS));
+			translation.updateGUI();
+			this.guiResetItem.setText(translation.getString(Language.Keys.SETTINGS_RESET));
+		}
+	}
+	
+	public void setLanguage(String langName, Main main) {
+		this.language = langName;
+		main.updateLanguage();
+	}
 	
 	public boolean AreTrayMenuLabelsShown() {
 		return this.showTrayMenuLabels;
