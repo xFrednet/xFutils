@@ -364,13 +364,6 @@ public class Main {
 		});
 		Main.Logger.logInfo("showTrayMenu: The trayMenu should be visible now!");
 
-		try {
-			Image icon = ImageIO.read(ImageIO.createImageInputStream(new File("res/icon.png")));
-			this.trayIcon.setImage(icon);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		// So, am I proud of this code, well I'm proud I found a well 
 		// working solution for my problem
 	}
