@@ -75,7 +75,7 @@ public class Main {
 	// # main #
 	// ##########################################
 	/**
-	 * The {@linkplain #main(String[])} method and therefore the entry point of this project.
+	 * The main method and therefore the entry point of this project.
 	 * The main method starts to process the arguments, if {@linkplain #ProcessArgs} returns
 	 * true it will continue to initialize the instance of this class and add a shutdownhook
 	 * at the end that calls the {@linkplain #TerminateApp()} function when the Application terminates
@@ -97,15 +97,10 @@ public class Main {
 		}
 		
 		// Add ShutdownHook to make sure everything terminates correctly
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				Main.TerminateApp();
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> Main.TerminateApp()));
 	}
 	/**
-	 * {@link #ProcessArgs(String[]) <tt>ProcessArgs</tt>} processes the arguments that
+	 * ProcessArgs processes the arguments that
 	 * are given to the {@linkplain #main(String[])} method. It should be called right at
 	 * the start of the application because it can initialize values that effect the inner
 	 * working of this Application.
@@ -188,7 +183,6 @@ public class Main {
 	 * <p>This function is called by a ShutdownHook, it will be called automatically
 	 * when the application is shutdown in any way. (The exception to the rule is 
 	 * terminating it with a debugger)</p>
-	 * 
 	 * */
 	private static void TerminateApp() {
 		if (instance != null) {
@@ -350,10 +344,7 @@ public class Main {
 	 * */
 	private void initTrayMenu() {
 		this.trayMenu = new JPopupMenu();
-		this.trayIcon.addActionListener(l -> {
-			Main.Logger.logAlert(l.toString());
-		});
-		
+
 		this.trayMenu.addSeparator(); // Plugins section
 		this.trayMenu.addSeparator(); // Links section
 		
