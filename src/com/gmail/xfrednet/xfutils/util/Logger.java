@@ -2,7 +2,6 @@ package com.gmail.xfrednet.xfutils.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 

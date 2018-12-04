@@ -14,7 +14,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -24,24 +23,66 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-
+/**
+ * This is the main class of this entire project it manages all subsystems
+ * of this application. it also includes the {@link #main(String[]) <tt>main</tt>}
+ * method.
+ * */
 public class Main {
 
-	// Static resources
+	/**
+	 * This is the main icon of xFutils, I know it's the most beautiful
+	 * thing you have ever seen. It was designed by me the one and truly only
+	 * xFrednet. Praise me in your love and devotion for this icon.
+	 * 
+	 * <p>You can use <tt>new ImageIcon(MAIN_ICON);</tt> to create a 
+	 * {@link java.awt.Icon <tt>Icon</tt>} from this image</p>
+	 * */
 	public static final Image MAIN_ICON = LoadResourceImage("icon.png");
 
 	// Static Values
+	/**
+	 * The current instance of the {@link com.gmail.xfrednet.xfutils.util.Logger <tt>Logger</tt>}
+	 * class. It is used for logging all events. The logger that is used to initialize this 
+	 * value can be defined by arguments in {@linkplain #ProcessArgs(String[])}.
+	 * */
 	public static Logger  Logger             = new NoLogLogger();
+	/**
+	 * This value indicates if debug was enabled for this application.
+	 * Debugging can be enabled with the <tt>-debug</tt> argument and is 
+	 * set by {@linkplain #ProcessArgs(String[])}
+	 * */
 	public static boolean IsDebugEnabled     = false;
+	/**
+	 * This value indicates if plugins should be enabled for this application.
+	 * Plugins can be disabled with the <tt>-noplugins</tt> argument and is 
+	 * set by {@linkplain #ProcessArgs(String[])}
+	 * */
 	public static boolean ArePluginsEnabled  = true;
+	/**
+	 * This value indicates if links should be enabled for this application.
+	 * Links can be disabled with the <tt>-nolinks</tt> argument and is 
+	 * set by {@linkplain #ProcessArgs(String[])}
+	 * */
 	public static boolean AreLinksEnabled    = true;
 
-	// This value should only be used by the TerminateApp function
+	/**
+	 * This is the current instance of this class it is and should only
+	 * be used by the {@linkplain #TerminateApp()} function.*/
 	private static Main instance             = null;
 	
 	// ##########################################
 	// # main #
 	// ##########################################
+	/**
+	 * The {@linkplain #main(String[])} method and therefore the entry point of this project.
+	 * The main method starts to process the arguments, if {@linkplain #ProcessArgs} returns
+	 * true it will continue to initialize the instance of this class and add a shutdownhook
+	 * at the end that calls the {@linkplain #TerminateApp()} function when the Application terminates
+	 * 
+	 * @param args:
+	 *      Arguments that can be given by the user. The arguments are processed by {@linkplain #ProcessArgs}.
+	 * */
 	public static void main(String[] args) {
 		if (!ProcessArgs(args)) {
 			Logger.endLog();
@@ -51,6 +92,7 @@ public class Main {
 		instance = new Main();
 		if (!instance.init()) {
 			Logger.logError("main: Something failed durring the initialize of Main. Goodbye");
+			Logger.endLog();
 			System.exit(1); // TODO create predefined errors
 		}
 		
@@ -62,6 +104,19 @@ public class Main {
 			}
 		});
 	}
+	/**
+	 * {@link #ProcessArgs(String[]) <tt>ProcessArgs</tt>} processes the arguments that
+	 * are given to the {@linkplain #main(String[])} method. It should be called right at
+	 * the start of the application because it can initialize values that effect the inner
+	 * working of this Application.
+	 * 
+	 * @param args:
+	 *        The arguments that should be processed, these should be the unmodified arguments
+	 *        given to the {@linkplain #main(String[])} method.
+	 *        
+	 * @return It returns <tt>true</tt> if the application should continue to start.
+	 *         The application should terminate in case of it returning <tt>false</tt>. 
+	 * */
 	private static boolean ProcessArgs(String[] args) {
 		for (String arg : args) {
 			switch (arg) {
@@ -124,6 +179,17 @@ public class Main {
 		}
 		return true;
 	}
+	/**
+	 * This function calls the {@linkplain #terminate()} method of the {@linkplain Main} class.
+	 * After {@linkplain Main} was terminated it will call the 
+	 * {@link com.gmail.xfrednet.xfutils.util.Logger#endLog() <tt>endLog()</tt>} method of the 
+	 * current {@link com.gmail.xfrednet.xfutils.util.Logger <tt>Logger</tt>} instance.
+	 * 
+	 * <p>This function is called by a ShutdownHook, it will be called automatically
+	 * when the application is shutdown in any way. (The exception to the rule is 
+	 * terminating it with a debugger)</p>
+	 * 
+	 * */
 	private static void TerminateApp() {
 		if (instance != null) {
 			instance.terminate();
@@ -134,12 +200,20 @@ public class Main {
 			Logger = null;
 		}
 	}
-
-	private static Image LoadResourceImage(String iconName) {
+	
+	/** This Function loads a {@link java.awt.Image <tt>Image</tt>} with
+	 * the given name from resource.
+	 * 
+	 * @param  imageName The name of the image file.
+	 * 	
+	 * @return The loaded {@link java.awt.Image <tt>Image</tt>} or <tt>null</tt>
+	 *         if something failed during the loading process.
+	 * */
+	private static Image LoadResourceImage(String imageName) {
 		// Ask the ClassLoader for the resource URL
-		URL resURL = ClassLoader.getSystemClassLoader().getResource(iconName);
+		URL resURL = ClassLoader.getSystemClassLoader().getResource(imageName);
 		if (resURL == null) {
-			Logger.logError("Main. LoadResourceIcon: The ClassLoader was unable to find the icon as a resource: " + iconName);
+			Logger.logError("Main. LoadResourceIcon: The ClassLoader was unable to find the icon as a resource: " + imageName);
 			return null;
 		}
 
@@ -148,7 +222,7 @@ public class Main {
 			return ImageIO.read(resURL);
 		} catch (IOException e) {
 			e.printStackTrace();
-			Logger.logError("Main. LoadResourceIcon: Unable to load the icon from resource: " + iconName, e);
+			Logger.logError("Main. LoadResourceImage: Unable to load the image from resource: " + imageName, e);
 			return null;
 		}
 	}
@@ -160,18 +234,49 @@ public class Main {
 	private static final int MENU_SECTION_LINKS   = 1;
 	private static final int MENU_SECTION_META    = 2;
 	
+	/**
+	 * This is the current instance of the 
+	 * {@link com.gmail.xfrednet.xfutils.util.Settings <tt>Settings</tt>} class. It
+	 * is initialized by {@linkplain #init()}.
+	 * */
 	private Settings settings;
+	/**
+	 * This is the current instance of the 
+	 * {@link com.gmail.xfrednet.xfutils.util.Language <tt>Language</tt>} class. It
+	 * is initialized by {@linkplain #init()}.
+	 * */
 	private Language language;
 	
 	private TrayIcon trayIcon;
 	private JPopupMenu trayMenu;
 	private int[] trayMenuSectionEnd;
 
-	// The PluginManager will only be valid if Main.argPluginsEnabled
-	// is true. So please make sure to check for null before usage.
+	/**
+	 * This is the current instance of the 
+	 * {@link com.gmail.xfrednet.xfutils.plugin.PluginManager <tt>PluginManager</tt>} class. It
+	 * is initialized by {@linkplain #initPluginManager()}.
+	 * 
+	 * <p>The {@link com.gmail.xfrednet.xfutils.plugin.PluginManager <tt>PluginManager</tt>} will
+	 * only be valid if {@linkplain #ArePluginsEnabled} is <tt>true</tt>. Please check if
+	 * this value is null before using it</p>
+	 * */
 	private PluginManager pluginManager;
+	/**
+	 * This is the current instance of the 
+	 * {@link com.gmail.xfrednet.xfutils.link.LinkManager <tt>LinkManager</tt>} class. It
+	 * is initialized by {@linkplain #initLinkManager()}.
+	 * 
+	 * <p>The {@link com.gmail.xfrednet.xfutils.link.LinkManager <tt>LinkManager</tt>} will
+	 * only be valid if {@linkplain #AreLinksEnabled} is <tt>true</tt>. Please check if
+	 * this value is null before using it</p>
+	 * */
 	private LinkManager linkManager;
 	
+	/**
+	 * The constructor of the {@link com.gmail.xfrednet.xfutils.Main <tt>Main</tt>} class.
+	 * It simply initializes most values with null. To initialize the Members for use call
+	 * {@linkplain #init()}
+	 * */
 	private Main() {
 		this.settings = null;
 		this.language = null;
@@ -187,6 +292,16 @@ public class Main {
 	// ##########################################
 	// # init
 	// ##########################################
+	/**
+	 * This method initializes all members of this class. The initialized
+	 * TrayIcon is also added to the SystemTray.
+	 * 
+	 * <p>This method will call all other init method within this class and
+	 * its members, these should not be called separately again</p>
+	 * 
+	 * @return This method returns false if something really critical fails. The
+	 *         error error that caused this will also be logged to the console.
+	 * */
 	private boolean init() {
 		// Settings
 		this.settings = new Settings();
@@ -229,6 +344,10 @@ public class Main {
 		// Return le trùe
 		return true;
 	}
+	/**
+	 * This method initializes the Traymenu, it is called automatically
+	 * by {@linkplain #init()}
+	 * */
 	private void initTrayMenu() {
 		this.trayMenu = new JPopupMenu();
 		this.trayIcon.addActionListener(l -> {
@@ -288,6 +407,10 @@ public class Main {
 		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1�)");
 	}
 
+	/**
+	 * This method initializes the PluginManager if plugins are enabled, 
+	 * it is called automatically by {@linkplain #init()}
+	 * */
 	private void initPluginManager() {
 		if (!ArePluginsEnabled)
 			return;
@@ -302,6 +425,10 @@ public class Main {
 
 		Main.Logger.logInfo("Main.initPluginManager: The PluginManager was successfully initialized");
 	}
+	/**
+	 * This method initializes the LinkManager if links are enabled, 
+	 * it is called automatically by {@linkplain #init()}
+	 * */
 	private void initLinkManager() {
 		if (!AreLinksEnabled)
 			return;
@@ -389,6 +516,12 @@ public class Main {
 	// ##########################################
 	// # terminate
 	// ##########################################
+	/**
+	 * This finishes all tasks and passes the terminate call to it's members.
+	 * 
+	 * <p>It is called by the {@linkplain #TerminateApp()} function and
+	 * should not be called by any other sources</p>
+	 * */
 	private void terminate() {
 		if (this.trayMenu.isVisible()) {
 			this.trayMenu.setVisible(false);
