@@ -233,15 +233,20 @@ public class Main {
 	 * {@link com.gmail.xfrednet.xfutils.util.Settings <tt>Settings</tt>} class. It
 	 * is initialized by {@linkplain #init()}.
 	 * */
-	private Settings settings;
+	private Settings settings = null;
 	/**
 	 * This is the current instance of the 
 	 * {@link com.gmail.xfrednet.xfutils.util.Language <tt>Language</tt>} class. It
 	 * is initialized by {@linkplain #init()}.
 	 * */
-	private Language language;
-	
-	private TrayIcon trayIcon;
+	private Language language = null;
+
+	/**
+	 * This is the icon of the {@link java.awt.TrayIcon <tt>TrayIcon</tt>} class.
+	 * The TrayIcon is the java main way to interface with the system tray in windows
+	 */
+	private TrayIcon trayIcon = null;
+
 	private JPopupMenu trayMenu;
 	private int[] trayMenuSectionEnd;
 
@@ -254,7 +259,7 @@ public class Main {
 	 * only be valid if {@linkplain #ArePluginsEnabled} is <tt>true</tt>. Please check if
 	 * this value is null before using it</p>
 	 * */
-	private PluginManager pluginManager;
+	private PluginManager pluginManager = null;
 	/**
 	 * This is the current instance of the 
 	 * {@link com.gmail.xfrednet.xfutils.link.LinkManager <tt>LinkManager</tt>} class. It
@@ -264,7 +269,7 @@ public class Main {
 	 * only be valid if {@linkplain #AreLinksEnabled} is <tt>true</tt>. Please check if
 	 * this value is null before using it</p>
 	 * */
-	private LinkManager linkManager;
+	private LinkManager linkManager = null;
 	
 	/**
 	 * The constructor of the {@link com.gmail.xfrednet.xfutils.Main <tt>Main</tt>} class.
@@ -272,15 +277,8 @@ public class Main {
 	 * {@linkplain #init()}
 	 * */
 	private Main() {
-		this.settings = null;
-		this.language = null;
-		
-		this.trayIcon = null;
 		this.trayMenu = null;
 		this.trayMenuSectionEnd = new int[] {0, 1, 2};
-		
-		this.pluginManager = null;
-		this.linkManager = null;
 	}
 	
 	// ##########################################
@@ -445,46 +443,7 @@ public class Main {
 	// # TrayMenu stuff and things
 	// ##########################################
 	
-	private void showTrayMenu(int x, int y) {
-		// So the following, the TrayIcon does not work well with
-		// a JPopupMenu, and with not well I mean not at all. The main problem
-		// is that menu wouldn't close it self.
-		// So what did I do? well I create a JDialog without any decoration, that has a
-		// alpha value of 0. The JPopupMenu, now behaves like a good boy, the only problem
-		// is disposing the dialog after the JPopupMenu is done. The easy fix? Add a
-		// PopupMenuListener that disposes the dialog when the menu goes invisible
-		
-		// Create the dialog
-		JDialog dialog = new JDialog();
-		dialog.setFocusable(true);
-		dialog.setBounds(x, y, 10, 10);
-		dialog.setUndecorated(true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setAlwaysOnTop(true);
-		dialog.setVisible(true);
-		dialog.setOpacity(0.0f);
-		
-		// Show the menu
-		// The x and y values for the tray menu are now dialog relative
-		this.trayMenu.show(dialog, 0, 0);
-		this.trayMenu.addPopupMenuListener(new PopupMenuListener() {
-			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
 
-			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				Main.Logger.logDebugMessage("trayMenu.PopupMenuListener: The menu will become invisible, the dialog will be disposed");
-				dialog.dispose();
-			}
-
-			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {}
-		});
-		Main.Logger.logInfo("showTrayMenu: The trayMenu should be visible now!");
-
-		// So, am I proud of this code, well I'm proud I found a well 
-		// working solution for my problem
-	}
 	// This method adds the @JMenuItem at the end of the section.
 	// A new section starts with a separator.
 	private void addMenuItem(JMenuItem item, int sectionNo) {
