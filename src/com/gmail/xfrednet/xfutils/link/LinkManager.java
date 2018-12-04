@@ -19,6 +19,11 @@ import com.gmail.xfrednet.xfutils.util.Language;
 
 import sun.awt.shell.ShellFolder;
 
+/**
+ * This is the link manager of xFutils. It loads links from the
+ * {@link #LINK_DIR <tt>link directory</tt>} and converters them to JMenuItems
+ * that execute the link when they are activated on.
+ * */
 public class LinkManager {
 
 	private static final String LINK_DIR    = "links\\";
@@ -27,8 +32,14 @@ public class LinkManager {
 	
 	private Language language;
 	
-	// This method validates the link directory and it's right to be initialized.
-	// @returns: true if the instance is valid and can be used. 
+	/**
+	 * This method tests if the {@link #LINK_DIR <tt>link directory</tt>}
+	 * is valid and if the {@link com.gmail.xfrednet.xfutils.links.LinkManager}
+	 * can be used.
+	 * 
+	 * @return It returns true if this instance can be used and if the 
+	 *         directory is valid.
+	 * */
 	public boolean init(Language language) {
 		if (!Main.AreLinksEnabled)
 			return false;
