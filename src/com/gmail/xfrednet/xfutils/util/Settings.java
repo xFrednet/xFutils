@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.swing.*;
 
 import com.gmail.xfrednet.xfutils.Main;
+import com.gmail.xfrednet.xfutils.util.language.Language;
 
 public class Settings {
 	

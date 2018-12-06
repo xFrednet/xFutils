@@ -3,9 +3,9 @@ package com.gmail.xfrednet.xfutils;
 import com.gmail.xfrednet.xfutils.link.LinkManager;
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.IndependentPopupMenu;
-import com.gmail.xfrednet.xfutils.util.Language;
 import com.gmail.xfrednet.xfutils.util.Logger;
 import com.gmail.xfrednet.xfutils.util.Settings;
+import com.gmail.xfrednet.xfutils.util.language.Language;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
@@ -237,7 +237,7 @@ public class Main {
 	private Settings settings = null;
 	/**
 	 * This is the current instance of the 
-	 * {@link com.gmail.xfrednet.xfutils.util.Language <tt>Language</tt>} class. It
+	 * {@link com.gmail.xfrednet.xfutils.util.language.Language <tt>Language</tt>} class. It
 	 * is initialized by {@linkplain #init()}.
 	 * */
 	private Language language = null;
