@@ -1,6 +1,8 @@
 package com.gmail.xfrednet.xfutils.util.language;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -17,7 +19,7 @@ public class Language {
 	private static final String AVAILABLE_LANGUAGES = "translations\\available_languages.txt";
 	
 	public static Language Init(String langName) {
-		Language lang = new Language(langName);
+		Language lang = new Language();
 		
 		if (lang.loadResource(langName)) {
 			// Return the object if init() was successful 
@@ -39,34 +41,92 @@ public class Language {
 		}
 	}
 	
-	private String languageAbbreviation;
-	private Locale localeInfo;
-	private ResourceBundle resource;
+	/**
+	 * This is the {@linkplain Locale} object that holds localized information
+	 * here it is only used to store the language name
+	 * */
+	private Locale localeInfo = null;
 	
-	private JMenu guiSettingsMenu;
+	/**
+	 * These {@linkplain Properties} are used as a map that contain all translations.
+	 * */
+	private Properties translation = null;
+
+	/**
+	 * This {@linkplain List} contains all bundles that are loaded. These paths
+	 * will be used when {@linkplain #changeLanguage(String)} get's called.
+	 * */
+	private List<String> resourceBundlePaths = null;
 	
-	private Language(String lang) {
-		this.languageAbbreviation = lang;
-		this.localeInfo = null;
-		this.resource = null;
-		this.guiSettingsMenu = null;
+	/**
+	 * This {@linkplain List} contains all {@linkplain ILanguageListener}s that will
+	 * be notified when the language changes.
+	 * */
+	private List<ILanguageListener> changeListeners = null;
+	
+	private JMenu guiSettingsMenu = null;
+	
+	/**
+	 * This initializes some values. Call {@linkplain #loadLanguage(String)}
+	 * to actually load the class
+	 * */
+	private Language() {
+		this.resourceBundlePaths = new ArrayList<>();
+		this.resourceBundlePaths.add(RESOURCE_BUNDLE_BASE_NAME);
+		
+		this.changeListeners = new ArrayList<>();
 	}
 	
-	public boolean loadResource(String languageAbbreviation) {
-		this.languageAbbreviation = languageAbbreviation;
+	/**
+	 * This method changes the language. It is also used to initialize the language.
+	 * 
+	 * This will reload the entire translations, to add a resource bundle
+	 * please call {@linkplain #addResource(String)}.
+	 * 
+	 * @param langAbb The abbreviation of the new language.
+	 * */
+	public void changeLanguage(String language) {
+		this.localeInfo = new Locale(language);
 		
-		this.localeInfo = new Locale(this.languageAbbreviation);
+		
+	}
+	/**
+	 * This tries to add the language specific {@linkplain ResourceBundle}
+	 * from the given bundle path.
+	 * 
+	 * <p>This method will try to handle loading issues by loading the
+	 * English resource if the language loading failed. A info will be written
+	 * to the console. In case of this failing as well, it will log an Error
+	 * to the logger and give up.</p>
+	 * 
+	 * @param bundlePath The path of the bundle that should be loaded.
+	 * @param locale The {@linkplain Locale} that should be used to load the right resource.
+	 * */
+	public boolean addResource(String bundlePath) {
+		return addResource(bundlePath, this.localeInfo);
+	}
+	private boolean loadResource(String bundlePath, Locale locale) {
 		try	{
-			this.resource = ResourceBundle.getBundle(
+			ResourceBundle resource = ResourceBundle.getBundle(
 					RESOURCE_BUNDLE_BASE_NAME, 
-					this.localeInfo);
+					locale);
+			
+			resource.keySet().stream().forEach(key -> this.translation.put(key, resource.getString(key)));
 			
 			Main.Logger.logInfo("Language.init: The language \"" + getString(Keys.LANG_NAME) + "\" Successfully :)");
 			return true;
 		} catch (Exception e) {
-			Main.Logger.logAlert(
-					"Language.init: Loading the ResourceBoundle(" +
-			        this.languageAbbreviation + ") has failed!", e);
+			// check id the local is a english local
+			Locale engLocale = new Locale("en");
+			if (!locale.getLanguage().equals(engLocale.getLanguage())) {
+				// try to load the English local if the given local doesn't have a resource
+				return loadResource(bundlePath, locale);
+			} else {
+				// Well we've failed and with "we" I mean YOU!!!
+				Main.Logger.logAlert(
+						"Language.init: Loading the ResourceBoundle(" +
+								this.languageAbbreviation + ") has failed!", e);
+			}
 			
 			return false;
 		}
@@ -82,12 +142,10 @@ public class Language {
 	}
 	
 	public String getLanguage() {
-		return this.languageAbbreviation;
-	}
-	public Locale getLocale() {
-		return this.localeInfo;
+		return this.localeInfo.getLanguage();
 	}
 
+	
 	public JMenu createSettingsMenu(Settings settings, Main main) {
 		this.guiSettingsMenu = new JMenu(getString(Keys.SETTINGS_LANGUAGE_MENU));
 		
@@ -131,6 +189,7 @@ public class Language {
 		}
 	}
 
+	
 	public class Keys {
 		public static final String LANG_NAME = "lang_name";
 		
