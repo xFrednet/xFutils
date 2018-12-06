@@ -21,8 +21,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 /**
  * This is the main class of this entire project it manages all subsystems
@@ -98,7 +96,7 @@ public class Main {
 		}
 		
 		// Add ShutdownHook to make sure everything terminates correctly
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> Main.TerminateApp()));
+		Runtime.getRuntime().addShutdownHook(new Thread(Main::TerminateApp));
 	}
 	/**
 	 * ProcessArgs processes the arguments that
@@ -252,7 +250,7 @@ public class Main {
 	 * This is the menu that will be shown when the {@linkplain #trayIcon} is
 	 * clicked.
 	 * 
-	 * @see {@linkplain IndependentPopupMenu} for more information.
+	 * @see IndependentPopupMenu for more information.
 	 * */
 	private IndependentPopupMenu trayMenu = null;
 
@@ -301,7 +299,7 @@ public class Main {
 		}
 		
 		// Language
-		this.language = Language.Init(this.settings.getLanguage());
+		this.language = new Language(this.settings.getLanguage());
 		
 		// Test if the TrayIcon is support
 		if (!SystemTray.isSupported()) {
@@ -370,7 +368,7 @@ public class Main {
 			@Override
 			public void mouseClicked(MouseEvent e) {}
 			@Override
-			public void mousePressed(MouseEvent e) {}			
+			public void mousePressed(MouseEvent e) {}
 			@Override
 			public void mouseEntered(MouseEvent e) {}
 			@Override
@@ -382,7 +380,6 @@ public class Main {
 					Main.this.trayMenu.showMenu(e.getX(), e.getY());
 				}
 			}
-			
 		});
 		
 		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1�)");
@@ -466,14 +463,8 @@ public class Main {
 		return this.language;
 	}
 	public void updateLanguage() {
-		String oldLang = this.language.getLanguage();
-		
-		// Check if the new language could be loaded
-		if (!this.language.loadResource(this.settings.getLanguage())) {
-			this.language.loadResource(oldLang);
-			return;
-		}
-		
+		this.language.changeLanguage(this.settings.getLanguage());
+
 		this.settings.updateGUI(this.language);
 	}
 }
