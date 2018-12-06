@@ -2,6 +2,7 @@ package com.gmail.xfrednet.xfutils;
 
 import com.gmail.xfrednet.xfutils.link.LinkManager;
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
+import com.gmail.xfrednet.xfutils.util.IndependentPopupMenu;
 import com.gmail.xfrednet.xfutils.util.Language;
 import com.gmail.xfrednet.xfutils.util.Logger;
 import com.gmail.xfrednet.xfutils.util.Settings;
@@ -75,7 +76,7 @@ public class Main {
 	// # main #
 	// ##########################################
 	/**
-	 * The {@linkplain #main(String[])} method and therefore the entry point of this project.
+	 * The main method and therefore the entry point of this project.
 	 * The main method starts to process the arguments, if {@linkplain #ProcessArgs} returns
 	 * true it will continue to initialize the instance of this class and add a shutdownhook
 	 * at the end that calls the {@linkplain #TerminateApp()} function when the Application terminates
@@ -97,15 +98,10 @@ public class Main {
 		}
 		
 		// Add ShutdownHook to make sure everything terminates correctly
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				Main.TerminateApp();
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> Main.TerminateApp()));
 	}
 	/**
-	 * {@link #ProcessArgs(String[]) <tt>ProcessArgs</tt>} processes the arguments that
+	 * ProcessArgs processes the arguments that
 	 * are given to the {@linkplain #main(String[])} method. It should be called right at
 	 * the start of the application because it can initialize values that effect the inner
 	 * working of this Application.
@@ -188,7 +184,6 @@ public class Main {
 	 * <p>This function is called by a ShutdownHook, it will be called automatically
 	 * when the application is shutdown in any way. (The exception to the rule is 
 	 * terminating it with a debugger)</p>
-	 * 
 	 * */
 	private static void TerminateApp() {
 		if (instance != null) {
@@ -239,17 +234,27 @@ public class Main {
 	 * {@link com.gmail.xfrednet.xfutils.util.Settings <tt>Settings</tt>} class. It
 	 * is initialized by {@linkplain #init()}.
 	 * */
-	private Settings settings;
+	private Settings settings = null;
 	/**
 	 * This is the current instance of the 
 	 * {@link com.gmail.xfrednet.xfutils.util.Language <tt>Language</tt>} class. It
 	 * is initialized by {@linkplain #init()}.
 	 * */
-	private Language language;
-	
-	private TrayIcon trayIcon;
-	private JPopupMenu trayMenu;
-	private int[] trayMenuSectionEnd;
+	private Language language = null;
+
+	/**
+	 * This is the icon of the {@link java.awt.TrayIcon <tt>TrayIcon</tt>} class.
+	 * The TrayIcon is the java main way to interface with the system tray in windows
+	 */
+	private TrayIcon trayIcon = null;
+
+	/**
+	 * This is the menu that will be shown when the {@linkplain #trayIcon} is
+	 * clicked.
+	 * 
+	 * @see {@linkplain IndependentPopupMenu} for more information.
+	 * */
+	private IndependentPopupMenu trayMenu = null;
 
 	/**
 	 * This is the current instance of the 
@@ -260,7 +265,7 @@ public class Main {
 	 * only be valid if {@linkplain #ArePluginsEnabled} is <tt>true</tt>. Please check if
 	 * this value is null before using it</p>
 	 * */
-	private PluginManager pluginManager;
+	private PluginManager pluginManager = null;
 	/**
 	 * This is the current instance of the 
 	 * {@link com.gmail.xfrednet.xfutils.link.LinkManager <tt>LinkManager</tt>} class. It
@@ -270,24 +275,7 @@ public class Main {
 	 * only be valid if {@linkplain #AreLinksEnabled} is <tt>true</tt>. Please check if
 	 * this value is null before using it</p>
 	 * */
-	private LinkManager linkManager;
-	
-	/**
-	 * The constructor of the {@link com.gmail.xfrednet.xfutils.Main <tt>Main</tt>} class.
-	 * It simply initializes most values with null. To initialize the Members for use call
-	 * {@linkplain #init()}
-	 * */
-	private Main() {
-		this.settings = null;
-		this.language = null;
-		
-		this.trayIcon = null;
-		this.trayMenu = null;
-		this.trayMenuSectionEnd = new int[] {0, 1, 2};
-		
-		this.pluginManager = null;
-		this.linkManager = null;
-	}
+	private LinkManager linkManager = null;
 	
 	// ##########################################
 	// # init
@@ -349,31 +337,25 @@ public class Main {
 	 * by {@linkplain #init()}
 	 * */
 	private void initTrayMenu() {
-		this.trayMenu = new JPopupMenu();
-		this.trayIcon.addActionListener(l -> {
-			Main.Logger.logAlert(l.toString());
-		});
-		
-		this.trayMenu.addSeparator(); // Plugins section
-		this.trayMenu.addSeparator(); // Links section
-		
+		this.trayMenu = new IndependentPopupMenu(3);
+
 		if (this.settings.AreTrayMenuLabelsShown()) {
 			// TODO make labels nonlocal and update labels on language change
 			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
 			pluginsLabel.setEnabled(false); // make it a label
-			addMenuItem(pluginsLabel, MENU_SECTION_PLUGINS);
+			this.trayMenu.add(pluginsLabel, MENU_SECTION_PLUGINS);
 			
 			JMenuItem linksLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
 			linksLabel.setEnabled(false); // make it a label
-			addMenuItem(linksLabel, MENU_SECTION_LINKS);
+			this.trayMenu.add(linksLabel, MENU_SECTION_LINKS);
 			
 			JMenuItem metaLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
 			metaLabel.setEnabled(false); // make it a label
-			addMenuItem(metaLabel, MENU_SECTION_META);
+			this.trayMenu.add(metaLabel, MENU_SECTION_META);
 		}
 		
 		// Settings menu
-		addMenuItem(this.settings.getSettingsMenu(this), MENU_SECTION_META);
+		this.trayMenu.add(this.settings.getSettingsMenu(this), MENU_SECTION_META);
 		
 		// "Exit"-item
 		JMenuItem exitItem = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
@@ -381,26 +363,25 @@ public class Main {
 			Logger.logDebugMessage("Menu.Exit-Item: I was activated!");
 			System.exit(0);
 		});
-		addMenuItem(exitItem, MENU_SECTION_META);
+		this.trayMenu.add(exitItem, MENU_SECTION_META);
 		
 		// Add trayMenu to trayIcon
 		this.trayIcon.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {}
 			@Override
-			public void mousePressed(MouseEvent e) {}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					Main.this.showTrayMenu(e.getX(), e.getY());
-				}
-			}
-
+			public void mousePressed(MouseEvent e) {}			
 			@Override
 			public void mouseEntered(MouseEvent e) {}
 			@Override
 			public void mouseExited(MouseEvent e) {}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					Main.this.trayMenu.showMenu(e.getX(), e.getY());
+				}
+			}
 			
 		});
 		
@@ -420,7 +401,7 @@ public class Main {
 		this.pluginManager.initPlugins();
 		List<JMenuItem> pluginItems = this.pluginManager.getPluginMenuElements();
 		for (JMenuItem menuItem : pluginItems) {
-			addMenuItem(menuItem, MENU_SECTION_PLUGINS);
+			this.trayMenu.add(menuItem, MENU_SECTION_PLUGINS);
 		}
 
 		Main.Logger.logInfo("Main.initPluginManager: The PluginManager was successfully initialized");
@@ -444,73 +425,10 @@ public class Main {
 		// Add the JMenuItems from the LinkManager
 		JMenuItem[] linkItems = this.linkManager.getMenuItems();
 		for (JMenuItem item : linkItems) {
-			addMenuItem(item, MENU_SECTION_LINKS);
+			this.trayMenu.add(item, MENU_SECTION_LINKS);
 		}
 
 		Main.Logger.logInfo("Main.initLinkManager: The LinkManager was successfully initialized");
-	}
-	
-	// ##########################################
-	// # TrayMenu stuff and things
-	// ##########################################
-	
-	private void showTrayMenu(int x, int y) {
-		// So the following, the TrayIcon does not work well with
-		// a JPopupMenu, and with not well I mean not at all. The main problem
-		// is that menu wouldn't close it self.
-		// So what did I do? well I create a JDialog without any decoration, that has a
-		// alpha value of 0. The JPopupMenu, now behaves like a good boy, the only problem
-		// is disposing the dialog after the JPopupMenu is done. The easy fix? Add a
-		// PopupMenuListener that disposes the dialog when the menu goes invisible
-		
-		// Create the dialog
-		JDialog dialog = new JDialog();
-		dialog.setFocusable(true);
-		dialog.setBounds(x, y, 10, 10);
-		dialog.setUndecorated(true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setAlwaysOnTop(true);
-		dialog.setVisible(true);
-		dialog.setOpacity(0.0f);
-		
-		// Show the menu
-		// The x and y values for the tray menu are now dialog relative
-		this.trayMenu.show(dialog, 0, 0);
-		this.trayMenu.addPopupMenuListener(new PopupMenuListener() {
-			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
-
-			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				Main.Logger.logDebugMessage("trayMenu.PopupMenuListener: The menu will become invisible, the dialog will be disposed");
-				dialog.dispose();
-			}
-
-			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {}
-		});
-		Main.Logger.logInfo("showTrayMenu: The trayMenu should be visible now!");
-
-		// So, am I proud of this code, well I'm proud I found a well 
-		// working solution for my problem
-	}
-	// This method adds the @JMenuItem at the end of the section.
-	// A new section starts with a separator.
-	private void addMenuItem(JMenuItem item, int sectionNo) {
-		// Validation
-		if (sectionNo < 0 || sectionNo >= this.trayMenuSectionEnd.length) {
-			sectionNo = ((sectionNo < 0) ? 
-					0 : 
-					this.trayMenuSectionEnd.length - 1);
-		}
-		
-		// Add the item
-		this.trayMenu.insert(item, this.trayMenuSectionEnd[sectionNo]);
-		
-		// Count this and all following indices up
-		for (int index = sectionNo; index < this.trayMenuSectionEnd.length; index++) {
-			this.trayMenuSectionEnd[index]++;
-		}
 	}
 	
 	// ##########################################
@@ -523,9 +441,7 @@ public class Main {
 	 * should not be called by any other sources</p>
 	 * */
 	private void terminate() {
-		if (this.trayMenu.isVisible()) {
-			this.trayMenu.setVisible(false);
-		}
+		this.trayMenu.dispose();
 		this.trayMenu = null;
 		
 		if (this.pluginManager != null) {
@@ -534,6 +450,9 @@ public class Main {
 			Logger.logInfo("Main.terminate: Terminated the PluginManager instance.");
 		}
 		
+		this.settings = null;
+		this.language = null;
+		this.linkManager = null;
 		this.trayIcon = null;
 		// The TrayIcon will removed automatically by the SystenmTray.
 		// Calling the remove function from the ShutdownHook causes the 
