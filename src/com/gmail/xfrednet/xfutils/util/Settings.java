@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.swing.*;
 
 import com.gmail.xfrednet.xfutils.Main;
+import com.gmail.xfrednet.xfutils.util.language.Language;
 
 public class Settings {
 	
@@ -31,22 +32,15 @@ public class Settings {
 	private boolean showTrayMenuLabels;
 	private String language;
 	
-	private JMenu guiSettingsMenu;
-	private JCheckBoxMenuItem guiShowTrayMenuLabelsItem;
-	private JMenuItem guiResetItem;
 	// TODO add scale option
 	
 	public Settings() {
 		reset();
-		
-		this.guiSettingsMenu = null;
-		this.guiShowTrayMenuLabelsItem = null;
-		this.guiResetItem = null;
 	}
 	
 	public void reset() {
 		this.showTrayMenuLabels = true;
-		this.language = "en";
+		this.language = Language.GetDefaultLanguage();
 	}
 	
 	public boolean save() {
@@ -111,46 +105,40 @@ public class Settings {
 		return true;
 	}
 	
-	public JMenu getSettingsMenu(Main main) {
-		Language translation = main.getLanguage();
-		this.guiSettingsMenu = new JMenu(translation.getString(Language.Keys.MENU_ITEM_SETTINGS));
+	public JMenu getSettingsMenu(Language translation) {
+		JMenu setMenu = new JMenu();
+		translation.getGUIManager().add(setMenu, Language.Keys.MENU_ITEM_SETTINGS);
 		
 		// showTrayMenuLabels
-		this.guiShowTrayMenuLabelsItem = new JCheckBoxMenuItem(translation.getString(Language.Keys.SETTINGS_SHOW_TRAYMENU_LABELS));
-		this.guiShowTrayMenuLabelsItem.setState(this.showTrayMenuLabels);
-		this.guiShowTrayMenuLabelsItem.addActionListener(l -> {
+		JCheckBoxMenuItem showMenuLabelsItem = new JCheckBoxMenuItem();
+		translation.getGUIManager().add(showMenuLabelsItem, Language.Keys.SETTINGS_SHOW_TRAYMENU_LABELS);
+		showMenuLabelsItem.setState(this.showTrayMenuLabels);
+		showMenuLabelsItem.addActionListener(l -> {
 			// Assign new value and save the change
-			this.showTrayMenuLabels = this.guiShowTrayMenuLabelsItem.getState();
+			this.showTrayMenuLabels = showMenuLabelsItem.getState();
 			save();
 		});
-		this.guiSettingsMenu.add(this.guiShowTrayMenuLabelsItem);
+		setMenu.add(showMenuLabelsItem);
 
 		// language
-		this.guiSettingsMenu.add(translation.createSettingsMenu(this, main));
+		setMenu.add(translation.createSettingsMenu(this));
 
 		// reset
-		this.guiResetItem = new JMenuItem(translation.getString(Language.Keys.SETTINGS_RESET));
-		this.guiResetItem.addActionListener(l -> {
+		JMenuItem resetItem = new JMenuItem();
+		translation.getGUIManager().add(resetItem, Language.Keys.SETTINGS_RESET);
+		resetItem.addActionListener(l -> {
 			// reset and save
 			reset();
 			save();
 		});
-		this.guiSettingsMenu.add(this.guiResetItem);
+		setMenu.add(resetItem);
 		
 		// return
-		return this.guiSettingsMenu;
-	}
-	public void updateGUI(Language translation) {
-		if (this.guiSettingsMenu != null) {
-			this.guiSettingsMenu.setText(translation.getString(Language.Keys.MENU_ITEM_SETTINGS));
-			translation.updateGUI();
-			this.guiResetItem.setText(translation.getString(Language.Keys.SETTINGS_RESET));
-		}
+		return setMenu;
 	}
 	
-	public void setLanguage(String langName, Main main) {
+	public void setLanguage(String langName) {
 		this.language = langName;
-		main.updateLanguage();
 	}
 	
 	public boolean AreTrayMenuLabelsShown() {

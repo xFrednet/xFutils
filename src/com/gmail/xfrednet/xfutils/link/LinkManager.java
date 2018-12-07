@@ -15,7 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import com.gmail.xfrednet.xfutils.Main;
-import com.gmail.xfrednet.xfutils.util.Language;
+import com.gmail.xfrednet.xfutils.util.language.Language;
 
 import sun.awt.shell.ShellFolder;
 

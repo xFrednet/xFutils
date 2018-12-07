@@ -3,9 +3,9 @@ package com.gmail.xfrednet.xfutils;
 import com.gmail.xfrednet.xfutils.link.LinkManager;
 import com.gmail.xfrednet.xfutils.plugin.PluginManager;
 import com.gmail.xfrednet.xfutils.util.IndependentPopupMenu;
-import com.gmail.xfrednet.xfutils.util.Language;
 import com.gmail.xfrednet.xfutils.util.Logger;
 import com.gmail.xfrednet.xfutils.util.Settings;
+import com.gmail.xfrednet.xfutils.util.language.Language;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
@@ -21,8 +21,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 /**
  * This is the main class of this entire project it manages all subsystems
@@ -98,7 +96,7 @@ public class Main {
 		}
 		
 		// Add ShutdownHook to make sure everything terminates correctly
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> Main.TerminateApp()));
+		Runtime.getRuntime().addShutdownHook(new Thread(Main::TerminateApp));
 	}
 	/**
 	 * ProcessArgs processes the arguments that
@@ -237,7 +235,7 @@ public class Main {
 	private Settings settings = null;
 	/**
 	 * This is the current instance of the 
-	 * {@link com.gmail.xfrednet.xfutils.util.Language <tt>Language</tt>} class. It
+	 * {@link com.gmail.xfrednet.xfutils.util.language.Language <tt>Language</tt>} class. It
 	 * is initialized by {@linkplain #init()}.
 	 * */
 	private Language language = null;
@@ -252,7 +250,7 @@ public class Main {
 	 * This is the menu that will be shown when the {@linkplain #trayIcon} is
 	 * clicked.
 	 * 
-	 * @see {@linkplain IndependentPopupMenu} for more information.
+	 * @see IndependentPopupMenu for more information.
 	 * */
 	private IndependentPopupMenu trayMenu = null;
 
@@ -301,7 +299,7 @@ public class Main {
 		}
 		
 		// Language
-		this.language = Language.Init(this.settings.getLanguage());
+		this.language = new Language(this.settings.getLanguage());
 		
 		// Test if the TrayIcon is support
 		if (!SystemTray.isSupported()) {
@@ -341,21 +339,24 @@ public class Main {
 
 		if (this.settings.AreTrayMenuLabelsShown()) {
 			// TODO make labels nonlocal and update labels on language change
-			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
+			JMenuItem pluginsLabel = new JMenuItem();
+			this.language.getGUIManager().add(pluginsLabel, Language.Keys.MENU_LABEL_PLUGINS);
 			pluginsLabel.setEnabled(false); // make it a label
 			this.trayMenu.add(pluginsLabel, MENU_SECTION_PLUGINS);
 			
-			JMenuItem linksLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
+			JMenuItem linksLabel = new JMenuItem();
+			this.language.getGUIManager().add(linksLabel, Language.Keys.MENU_LABEL_LINKS);
 			linksLabel.setEnabled(false); // make it a label
 			this.trayMenu.add(linksLabel, MENU_SECTION_LINKS);
 			
-			JMenuItem metaLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
+			JMenuItem metaLabel = new JMenuItem();
+			this.language.getGUIManager().add(metaLabel, Language.Keys.MENU_LABEL_META);
 			metaLabel.setEnabled(false); // make it a label
 			this.trayMenu.add(metaLabel, MENU_SECTION_META);
 		}
 		
 		// Settings menu
-		this.trayMenu.add(this.settings.getSettingsMenu(this), MENU_SECTION_META);
+		this.trayMenu.add(this.settings.getSettingsMenu(this.language), MENU_SECTION_META);
 		
 		// "Exit"-item
 		JMenuItem exitItem = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
@@ -370,7 +371,7 @@ public class Main {
 			@Override
 			public void mouseClicked(MouseEvent e) {}
 			@Override
-			public void mousePressed(MouseEvent e) {}			
+			public void mousePressed(MouseEvent e) {}
 			@Override
 			public void mouseEntered(MouseEvent e) {}
 			@Override
@@ -382,7 +383,6 @@ public class Main {
 					Main.this.trayMenu.showMenu(e.getX(), e.getY());
 				}
 			}
-			
 		});
 		
 		Logger.logDebugMessage("The TrayIcon has a PopupMenu now. (Try it now for free: just 1�)");
@@ -454,26 +454,8 @@ public class Main {
 		this.language = null;
 		this.linkManager = null;
 		this.trayIcon = null;
-		// The TrayIcon will removed automatically by the SystenmTray.
+		// The TrayIcon will removed automatically by the SystemTray.
 		// Calling the remove function from the ShutdownHook causes the 
 		// Application to idle until the end of dawn.
-	}
-	
-	// ##########################################
-	// # Utility
-	// ##########################################
-	public Language getLanguage() {
-		return this.language;
-	}
-	public void updateLanguage() {
-		String oldLang = this.language.getLanguage();
-		
-		// Check if the new language could be loaded
-		if (!this.language.loadResource(this.settings.getLanguage())) {
-			this.language.loadResource(oldLang);
-			return;
-		}
-		
-		this.settings.updateGUI(this.language);
 	}
 }
