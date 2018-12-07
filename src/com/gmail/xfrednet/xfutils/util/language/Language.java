@@ -85,9 +85,12 @@ public class Language {
 			return "en";
 		} else {
 			// grab the first one
-			String[] list = (String[])available.values().toArray();
-			return list[0];
+			for (Object keyObject : available.keySet()) {
+				String key = (String)keyObject;
+				return available.getProperty(key);
+			}
 		}
+		return "en";
 	}
 	
 	// ####################################################

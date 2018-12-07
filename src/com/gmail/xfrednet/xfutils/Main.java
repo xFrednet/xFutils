@@ -339,15 +339,18 @@ public class Main {
 
 		if (this.settings.AreTrayMenuLabelsShown()) {
 			// TODO make labels nonlocal and update labels on language change
-			JMenuItem pluginsLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_PLUGINS));
+			JMenuItem pluginsLabel = new JMenuItem();
+			this.language.getGUIManager().add(pluginsLabel, Language.Keys.MENU_LABEL_PLUGINS);
 			pluginsLabel.setEnabled(false); // make it a label
 			this.trayMenu.add(pluginsLabel, MENU_SECTION_PLUGINS);
 			
-			JMenuItem linksLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_LINKS));
+			JMenuItem linksLabel = new JMenuItem();
+			this.language.getGUIManager().add(linksLabel, Language.Keys.MENU_LABEL_LINKS);
 			linksLabel.setEnabled(false); // make it a label
 			this.trayMenu.add(linksLabel, MENU_SECTION_LINKS);
 			
-			JMenuItem metaLabel = new JMenuItem(this.language.getString(Language.Keys.MENU_LABEL_META));
+			JMenuItem metaLabel = new JMenuItem();
+			this.language.getGUIManager().add(metaLabel, Language.Keys.MENU_LABEL_META);
 			metaLabel.setEnabled(false); // make it a label
 			this.trayMenu.add(metaLabel, MENU_SECTION_META);
 		}
@@ -451,7 +454,7 @@ public class Main {
 		this.language = null;
 		this.linkManager = null;
 		this.trayIcon = null;
-		// The TrayIcon will removed automatically by the SystenmTray.
+		// The TrayIcon will removed automatically by the SystemTray.
 		// Calling the remove function from the ShutdownHook causes the 
 		// Application to idle until the end of dawn.
 	}

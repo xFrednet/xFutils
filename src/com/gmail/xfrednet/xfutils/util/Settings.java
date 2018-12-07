@@ -40,7 +40,7 @@ public class Settings {
 	
 	public void reset() {
 		this.showTrayMenuLabels = true;
-		this.language = "en";
+		this.language = Language.GetDefaultLanguage();
 	}
 	
 	public boolean save() {
