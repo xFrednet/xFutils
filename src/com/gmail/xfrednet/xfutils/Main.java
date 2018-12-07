@@ -353,7 +353,7 @@ public class Main {
 		}
 		
 		// Settings menu
-		this.trayMenu.add(this.settings.getSettingsMenu(this), MENU_SECTION_META);
+		this.trayMenu.add(this.settings.getSettingsMenu(this.language), MENU_SECTION_META);
 		
 		// "Exit"-item
 		JMenuItem exitItem = new JMenuItem(this.language.getString(Language.Keys.MENU_ITEM_EXIT));
@@ -454,17 +454,5 @@ public class Main {
 		// The TrayIcon will removed automatically by the SystenmTray.
 		// Calling the remove function from the ShutdownHook causes the 
 		// Application to idle until the end of dawn.
-	}
-	
-	// ##########################################
-	// # Utility
-	// ##########################################
-	public Language getLanguage() {
-		return this.language;
-	}
-	public void updateLanguage() {
-		this.language.changeLanguage(this.settings.getLanguage());
-
-		this.settings.updateGUI(this.language);
 	}
 }

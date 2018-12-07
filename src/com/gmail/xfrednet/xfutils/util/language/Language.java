@@ -106,16 +106,21 @@ public class Language {
 	private Properties translation;
 
 	/**
+	* This {@linkplain List} contains all {@linkplain ILanguageListener}s that will
+	* be notified when the language changes.
+	* */
+	private List<ILanguageListener> changeListeners;
+	
+	/**
 	 * This {@linkplain List} contains all bundles that are loaded. These paths
 	 * will be used when {@linkplain #changeLanguage(String)} get's called.
 	 * */
 	private List<String> resourceBundlePaths;
 	
 	/**
-	 * This {@linkplain List} contains all {@linkplain ILanguageListener}s that will
-	 * be notified when the language changes.
+	 * This is the default {@linkplain LanguageGUIManager} for this language instance.
 	 * */
-	private List<ILanguageListener> changeListeners;
+	private LanguageGUIManager langGUIManager;
 	
 	/**
 	 * This initializes the class and loads the default translations.
@@ -126,8 +131,13 @@ public class Language {
 
 		this.changeListeners = new ArrayList<>();
 
+		// Initialize the resources
 		this.resourceBundlePaths = new ArrayList<>();
-		this.addResource(RESOURCE_BUNDLE_BASE_NAME);
+		addResource(RESOURCE_BUNDLE_BASE_NAME);
+		
+		// Initialize the langGUIManager
+		this.langGUIManager = new LanguageGUIManager(this);
+		addListener(this.langGUIManager);
 	}
 	
 	/**
@@ -220,6 +230,23 @@ public class Language {
 	}
 
 	/**
+	 * This adds a {@linkplain ILanguageListener} to the changeListener list.
+	 * */
+	public void addListener(ILanguageListener listener) {
+		this.changeListeners.add(listener);
+	}
+	
+	/**
+	 * This returns the default {@linkplain LanguageGUIManager} for this language
+	 * instance.
+	 * 
+	 * @return The instance if the {@linkplain LanguageGUIManager}
+	 * */
+	public LanguageGUIManager getGUIManager() {
+		return this.langGUIManager;
+	}
+	
+	/**
 	 * This look up the translation for the given key. Most default keys can be fount
 	 * in the {@link Language.Keys <tt>Keys</tt>} class.
 	 *
@@ -244,9 +271,9 @@ public class Language {
 		return this.localeInfo.getLanguage();
 	}
 	
-	private JMenu guiSettingsMenu = null;
-	public JMenu createSettingsMenu(Settings settings, Main main) {
-		this.guiSettingsMenu = new JMenu(getString(Keys.SETTINGS_LANGUAGE_MENU));
+	public JMenu createSettingsMenu(Settings settings) {
+		JMenu langMenu = new JMenu();
+		getGUIManager().add(langMenu, Keys.SETTINGS_LANGUAGE_MENU);
 		
 		Properties languages = GetAvailableLanguages();
 		
@@ -263,20 +290,15 @@ public class Language {
 			
 			// This action listener is only activated when the MenuItem gets selected
 			langItem.addActionListener(l -> {
-				settings.setLanguage(langAbbreviation, main);
+				settings.setLanguage(langAbbreviation);
 				settings.save();
 			});
 			
 			langStation.add(langItem);
-			this.guiSettingsMenu.add(langItem);
+			langMenu.add(langItem);
 		}
 		
-		return this.guiSettingsMenu;
-	}
-	public void updateGUI() {
-		if (this.guiSettingsMenu != null) {
-			this.guiSettingsMenu.setText(getString(Keys.SETTINGS_LANGUAGE_MENU));
-		}
+		return langMenu;
 	}
 
 	/**
