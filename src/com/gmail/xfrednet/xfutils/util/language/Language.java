@@ -270,7 +270,12 @@ public class Language {
 	public String getLanguage() {
 		return this.localeInfo.getLanguage();
 	}
-	
+
+	/**
+	 * This method create a {@linkplain JMenu} that displays all available
+	 * languages from the available_languages.txt file. This can be used
+	 * to switch languages.
+	 * */
 	public JMenu createSettingsMenu(Settings settings) {
 		JMenu langMenu = new JMenu();
 		getGUIManager().add(langMenu, Keys.SETTINGS_LANGUAGE_MENU);
@@ -292,6 +297,7 @@ public class Language {
 			langItem.addActionListener(l -> {
 				settings.setLanguage(langAbbreviation);
 				settings.save();
+				changeLanguage(langAbbreviation);
 			});
 			
 			langStation.add(langItem);

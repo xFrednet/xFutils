@@ -12,7 +12,7 @@ import javax.swing.event.PopupMenuListener;
  * This class wraps the {@link javax.swing.JPopupMenu <tt>JPopupMenu</tt>} class and
  * adds some needed features to use it without a JFrame or Window
  * 
- * <p>The {@linkplain JPopupMewnu} should support something called <tt>lightweight</tt>
+ * <p>The {@linkplain JPopupMenu} should support something called <tt>lightweight</tt>
  * this means that it can stand alone without being attached to a different swing
  * component. This <tt>lightweight</tt> mode does not seam to work very well. After 
  * some testing I found a working solution, that is described in the docu of 
@@ -180,7 +180,11 @@ public class IndependentPopupMenu {
 		this.popupMenu = null;
 		
 		// kill the support character
-		this.showSupporter.dispose();
+		// this.showSupporter.dispose();
+		//    So you might ask "Why is this only disposed in the commands?" Well let me
+		//    tell you a tale of honer and just a bug that keeps java the application from
+		//    when showSupporter.dispose() gets called. Well that is actually the story.
+		//    The honer thing is me trying this
 		this.showSupporter = null;
 		
 		// kill the author for these useless commands
