@@ -20,6 +20,81 @@ public class Language {
 	private static final String AVAILABLE_LANGUAGES = "translations\\available_languages.txt";
 	
 	/**
+	 * This load the language list that is stored in the "available_languages.txt".
+	 * 
+	 * @return The loaded list in form of a {@linkplain Properties} object. This will 
+	 * always return a valid object the key count can be checked for validation. 
+	 * (count > 0 => valid)
+	 * */
+	private static Properties GetAvailableLanguages() {
+		// Load the available languages from file. Note, that a language has to be
+		// added to the "available_languages.txt" in order to be loaded to the settings
+		Properties languages = new Properties();
+		try {
+			// try to load the file
+			languages.load(ClassLoader.getSystemResourceAsStream(AVAILABLE_LANGUAGES));
+		} catch (IOException e) {
+			// Log the exception
+			Main.Logger.logAlert("Language.getAvailableLanguages: Unable to open the available language file.");
+		}
+		
+		// These properties will be empty if something fails. I return it anyways
+		// to avoid a null pointer exception when using the result directly.
+		return languages;
+	}
+	/**
+	 * This uses {@linkplain #GetAvailableLanguages()} to load a list of all
+	 * available languages it than checks if the given language is a member
+	 * of this list.
+	 * 
+	 * @param language The abbreviation of the language that should be tested.
+	 * 
+	 * @return This returns true if the language is inside the available 
+	 * language file.
+	 * */
+	public static boolean IsLanguageSupported(String language) {
+		return GetAvailableLanguages().containsValue(language);
+	}
+	/**
+	 * This tries very hard to return a available language. It first of all
+	 * tries to get the system default {@linkplain Locale} and tests if the language
+	 * supported. If this test returns false it will test if the English language is
+	 * supported. If this test returns false it will load the file and test if any
+	 * languages are supported it will return "en" if not or the first available
+	 * languages from the list.
+	 * 
+	 * @return A language abbreviation that should be supported.
+	 * */
+	public static String GetDefaultLanguage() {
+		// Check if the system default locale is supported
+		Locale local = Locale.getDefault();
+		if (IsLanguageSupported(local.getLanguage())) {
+			return local.getLanguage();
+		}
+		
+		// Check if the default English language is supported
+		if (IsLanguageSupported("en")) {
+			return "en";
+		}
+		
+		// Check what actually is supported
+		Properties available = GetAvailableLanguages();
+		// check if the available languages file can even be loaded
+		if (available.isEmpty()) {
+			// return en when not because English will most probably be supported
+			return "en";
+		} else {
+			// grab the first one
+			String[] list = (String[])available.values().toArray();
+			return list[0];
+		}
+	}
+	
+	// ####################################################
+	// # Language Class #
+	// ####################################################
+	
+	/**
 	 * This is the {@linkplain Locale} object that holds localized information
 	 * here it is only used to store the language name
 	 * */
@@ -41,8 +116,6 @@ public class Language {
 	 * be notified when the language changes.
 	 * */
 	private List<ILanguageListener> changeListeners;
-	
-	private JMenu guiSettingsMenu = null;
 	
 	/**
 	 * This initializes the class and loads the default translations.
@@ -66,6 +139,10 @@ public class Language {
 	 * @param language The abbreviation of the new language.
 	 * */
 	public void changeLanguage(String language) {
+		if (!IsLanguageSupported(language)) {
+			return;
+		}
+		
 		this.localeInfo = new Locale(language);
 
 		// reload all resources for the new language
@@ -166,20 +243,12 @@ public class Language {
 	public String getLanguage() {
 		return this.localeInfo.getLanguage();
 	}
-
+	
+	private JMenu guiSettingsMenu = null;
 	public JMenu createSettingsMenu(Settings settings, Main main) {
 		this.guiSettingsMenu = new JMenu(getString(Keys.SETTINGS_LANGUAGE_MENU));
 		
-		// Load the available languages from file. Note, that a language has to be
-		// added to the "available_languages.txt" in order to be loaded to the settings
-		Properties languages = new Properties();
-		try {
-			languages.load(ClassLoader.getSystemResourceAsStream(AVAILABLE_LANGUAGES));
-		} catch (IOException e) {
-			Main.Logger.logAlert("Language.createSettingsMenu: Unable to open the available language file.");
-			this.guiSettingsMenu.setText(getString("[Error: IOException]"));
-			return this.guiSettingsMenu;
-		}
+		Properties languages = GetAvailableLanguages();
 		
 		// the languages are loaded now :)
 		ButtonGroup langStation = new ButtonGroup();
