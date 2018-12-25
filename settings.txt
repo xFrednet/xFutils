@@ -1,4 +1,4 @@
 #The magical awesome settings of xFutils
-#Sat Dec 01 14:26:06 CET 2018
+#Tue Dec 25 01:14:10 CET 2018
 showTrayMenuLabels=true
 language=en

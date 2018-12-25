@@ -9,10 +9,9 @@ import com.gmail.xfrednet.xfutils.util.language.Language;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
+import com.gmail.xfrednet.xfutils.wrapper.GlobalShortcut;
 
-import java.awt.Image;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -35,7 +34,7 @@ public class Main {
 	 * xFrednet. Praise me in your love and devotion for this icon.
 	 * 
 	 * <p>You can use <tt>new ImageIcon(MAIN_ICON);</tt> to create a 
-	 * {@link java.awt.Icon <tt>Icon</tt>} from this image</p>
+	 * {@link javax.swing.Icon <tt>Icon</tt>} from this image</p>
 	 * */
 	public static final Image MAIN_ICON = LoadResourceImage("icon.png");
 
@@ -188,6 +187,9 @@ public class Main {
 			instance.terminate();
 			instance = null;
 		}
+
+		GlobalShortcut.CleanUp();
+
 		if (Logger != null) {
 			Logger.endLog();
 			Logger = null;
@@ -326,7 +328,14 @@ public class Main {
 
 		// init the LinkManager
 		initLinkManager();
-		
+
+		int i1 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'Q', () -> {Logger.logInfo("Me Gusta a Keylogga");});
+		int i2 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'W', () -> {Logger.logInfo("Me Gusta a Keyloggw");});
+		int i3 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'E', () -> {Logger.logInfo("Me Gusta a Keylogge");});
+		int i4 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'R', () -> {Logger.logInfo("Me Gusta a Keyloggr");});
+		int i5 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'T', () -> {Logger.logInfo("Me Gusta a Keyloggt");});
+		int i6 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'Z', () -> {Logger.logInfo("Me Gusta a Keyloggz");});
+
 		// Return le trùe
 		return true;
 	}
