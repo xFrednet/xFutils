@@ -9,6 +9,9 @@ Planed Plugins:
 ## WARNING
 Some pieces of code may contain commands and explanations, we are currently dealing with this problem!!!
 
+## Credits
+- This software uses the [jintellitype](https://github.com/melloware/jintellitype) library created by [melloware](https://github.com/melloware) licensed under the [Apache License, Version 2.0](dependencies/jintellitype-1.3.9/license.txt)
+
 ## LICENSE
  Copyright (C) 2018, xFrednet <xFrednet@gmail.com>                           
 

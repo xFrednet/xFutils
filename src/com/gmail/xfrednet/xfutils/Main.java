@@ -9,10 +9,9 @@ import com.gmail.xfrednet.xfutils.util.language.Language;
 import com.gmail.xfrednet.xfutils.util.logger.ConsoleLogger;
 import com.gmail.xfrednet.xfutils.util.logger.FileLogger;
 import com.gmail.xfrednet.xfutils.util.logger.NoLogLogger;
+import com.gmail.xfrednet.xfutils.wrapper.GlobalShortcut;
 
-import java.awt.Image;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -35,7 +34,7 @@ public class Main {
 	 * xFrednet. Praise me in your love and devotion for this icon.
 	 * 
 	 * <p>You can use <tt>new ImageIcon(MAIN_ICON);</tt> to create a 
-	 * {@link java.awt.Icon <tt>Icon</tt>} from this image</p>
+	 * {@link javax.swing.Icon <tt>Icon</tt>} from this image</p>
 	 * */
 	public static final Image MAIN_ICON = LoadResourceImage("icon.png");
 
@@ -188,6 +187,9 @@ public class Main {
 			instance.terminate();
 			instance = null;
 		}
+
+		GlobalShortcut.GetInstance().cleanUp();
+
 		if (Logger != null) {
 			Logger.endLog();
 			Logger = null;
@@ -326,7 +328,7 @@ public class Main {
 
 		// init the LinkManager
 		initLinkManager();
-		
+
 		// Return le trùe
 		return true;
 	}
@@ -338,7 +340,6 @@ public class Main {
 		this.trayMenu = new IndependentPopupMenu(3);
 
 		if (this.settings.AreTrayMenuLabelsShown()) {
-			// TODO make labels nonlocal and update labels on language change
 			JMenuItem pluginsLabel = new JMenuItem();
 			this.language.getGUIManager().add(pluginsLabel, Language.Keys.MENU_LABEL_PLUGINS);
 			pluginsLabel.setEnabled(false); // make it a label
