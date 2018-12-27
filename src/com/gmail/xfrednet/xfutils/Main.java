@@ -188,7 +188,7 @@ public class Main {
 			instance = null;
 		}
 
-		GlobalShortcut.CleanUp();
+		GlobalShortcut.GetInstance().cleanUp();
 
 		if (Logger != null) {
 			Logger.endLog();
@@ -329,13 +329,6 @@ public class Main {
 		// init the LinkManager
 		initLinkManager();
 
-		int i1 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'Q', () -> {Logger.logInfo("Me Gusta a Keylogga");});
-		int i2 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'W', () -> {Logger.logInfo("Me Gusta a Keyloggw");});
-		int i3 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'E', () -> {Logger.logInfo("Me Gusta a Keylogge");});
-		int i4 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'R', () -> {Logger.logInfo("Me Gusta a Keyloggr");});
-		int i5 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'T', () -> {Logger.logInfo("Me Gusta a Keyloggt");});
-		int i6 = GlobalShortcut.RegisterGlobalShortcut(Event.CTRL_MASK, (int)'Z', () -> {Logger.logInfo("Me Gusta a Keyloggz");});
-
 		// Return le trùe
 		return true;
 	}
@@ -347,7 +340,6 @@ public class Main {
 		this.trayMenu = new IndependentPopupMenu(3);
 
 		if (this.settings.AreTrayMenuLabelsShown()) {
-			// TODO make labels nonlocal and update labels on language change
 			JMenuItem pluginsLabel = new JMenuItem();
 			this.language.getGUIManager().add(pluginsLabel, Language.Keys.MENU_LABEL_PLUGINS);
 			pluginsLabel.setEnabled(false); // make it a label

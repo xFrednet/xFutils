@@ -5,13 +5,13 @@ import com.gmail.xfrednet.xfutils.wrapper.IGlobalShortcutListener;
 
 public class NoGlobalShortcut extends GlobalShortcut {
 	@Override
-	protected int registerGlobalShortcut(int eventMask, int key, IGlobalShortcutListener listener) {
+	public int registerGlobalShortcut(int eventMask, int key, IGlobalShortcutListener listener) {
 		return -1;
 	}
 
 	@Override
-	protected void unregisterGlobalShortcut(int identifier) {}
+	public void unregisterGlobalShortcut(int identifier) {}
 
 	@Override
-	protected void cleanUp() {}
+	public void cleanUp() {}
 }
