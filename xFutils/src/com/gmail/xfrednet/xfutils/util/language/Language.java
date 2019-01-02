@@ -1,6 +1,7 @@
 package com.gmail.xfrednet.xfutils.util.language;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,10 +33,16 @@ public class Language {
 		Properties languages = new Properties();
 		try {
 			// try to load the file
-			languages.load(ClassLoader.getSystemResourceAsStream(AVAILABLE_LANGUAGES));
+			InputStream fileStream = ClassLoader.getSystemResourceAsStream(AVAILABLE_LANGUAGES);
+			if (fileStream == null) {
+				Main.Logger.logAlert("Language.GetAvailableLanguages: The file couldn't be found.");
+				return languages;
+			}
+
+			languages.load(fileStream);
 		} catch (IOException e) {
 			// Log the exception
-			Main.Logger.logAlert("Language.getAvailableLanguages: Unable to open the available language file.");
+			Main.Logger.logAlert("Language.GetAvailableLanguages: Unable to open the available language file.");
 		}
 		
 		// These properties will be empty if something fails. I return it anyways
