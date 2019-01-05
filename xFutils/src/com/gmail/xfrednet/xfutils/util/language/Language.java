@@ -1,7 +1,9 @@
 package com.gmail.xfrednet.xfutils.util.language;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -17,9 +19,11 @@ import javax.swing.*;
 @SuppressWarnings("WeakerAccess")
 public class Language {
 
-	private static final String RESOURCE_BUNDLE_BASE_NAME = "translations\\lang";
-	private static final String AVAILABLE_LANGUAGES = "translations\\available_languages.txt";
-	
+	private static final String RESOURCE_BUNDLE_BASE_NAME = "translations/lang";
+	private static final String AVAILABLE_LANGUAGES = "translations/available_languages.txt";
+
+	private static Properties AvailableLanguages = null;
+
 	/**
 	 * This load the language list that is stored in the "available_languages.txt".
 	 * 
@@ -28,18 +32,31 @@ public class Language {
 	 * (count > 0 => valid)
 	 * */
 	private static Properties GetAvailableLanguages() {
+		if (AvailableLanguages != null) {
+			return AvailableLanguages;
+		}
+
 		// Load the available languages from file. Note, that a language has to be
 		// added to the "available_languages.txt" in order to be loaded to the settings
-		Properties languages = new Properties();
+		AvailableLanguages = new Properties();
 		try {
-			// try to load the file
-			InputStream fileStream = ClassLoader.getSystemResourceAsStream(AVAILABLE_LANGUAGES);
-			if (fileStream == null) {
-				Main.Logger.logAlert("Language.GetAvailableLanguages: The file couldn't be found.");
-				return languages;
+			URL resURL = ClassLoader.getSystemClassLoader().getResource(AVAILABLE_LANGUAGES);
+			if (resURL != null) {
+
+				// try to load the file
+				InputStream fileStream = resURL.openStream();
+				if (fileStream == null) {
+					Main.Logger.logAlert("Language.GetAvailableLanguages: The file couldn't be found.");
+					return AvailableLanguages;
+				}
+
+				AvailableLanguages.load(fileStream);
+
+				fileStream.close();
+			} else {
+				System.out.println("Language.GetAvailableLanguages: The available_languages.txt URL couldn't be found.");
 			}
 
-			languages.load(fileStream);
 		} catch (IOException e) {
 			// Log the exception
 			Main.Logger.logAlert("Language.GetAvailableLanguages: Unable to open the available language file.");
@@ -47,7 +64,7 @@ public class Language {
 		
 		// These properties will be empty if something fails. I return it anyways
 		// to avoid a null pointer exception when using the result directly.
-		return languages;
+		return AvailableLanguages;
 	}
 	/**
 	 * This uses {@linkplain #GetAvailableLanguages()} to load a list of all
