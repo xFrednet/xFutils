@@ -28,8 +28,8 @@ import java.util.jar.Manifest;
 
 public class PluginManager {
 
-	private static final String PLUGIN_DIR             = "plugins\\";
-	private static final String PLUGIN_DATA_DIR        = PLUGIN_DIR + "data\\%s\\";
+	private static final String PLUGIN_DIR             = "../plugins/";
+	private static final String PLUGIN_DATA_DIR        = PLUGIN_DIR + "data/%s/";
 	private static final String ENABLED_PLUGINS_FILE   = PLUGIN_DIR + ".config.xml";
 	private static final String XML_ROOT_ELEMENT       = "pluginmamanger";
 	private static final String XML_ENABLED_PLUGIN_TAG = "plugin";

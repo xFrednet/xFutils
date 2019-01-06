@@ -26,7 +26,7 @@ import sun.awt.shell.ShellFolder;
  * */
 public class LinkManager {
 
-	private static final String LINK_DIR    = "links\\";
+	private static final String LINK_DIR    = "../links/";
 	static final String LINK_SUFFIX = ".lnk";
 	private static final int MENU_ICON_SIZE = 32;
 	
@@ -34,7 +34,7 @@ public class LinkManager {
 	
 	/**
 	 * This method tests if the {@link #LINK_DIR <tt>link directory</tt>}
-	 * is valid and if the {@link com.gmail.xfrednet.xfutils.links.LinkManager}
+	 * is valid and if the {@link com.gmail.xfrednet.xfutils.link.LinkManager}
 	 * can be used.
 	 * 
 	 * @return It returns true if this instance can be used and if the 
