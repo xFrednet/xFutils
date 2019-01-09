@@ -26,7 +26,7 @@ public class Settings {
 		}
 	}
 	
-	public static final String SETTINGS_FILE = "settings.txt";
+	public static final String SETTINGS_FILE = "../settings.txt";
 	public static final String LOADING_ERROR_STRING = "[LOADING ERROR]";
 	
 	private boolean showTrayMenuLabels;

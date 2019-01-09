@@ -18,7 +18,7 @@ public class FileLogger extends Logger {
 	File logFile = null;
 	
 	public static String GetNewLogFileName() {
-		String baseFileName = "./log/log_%s.txt";
+		String baseFileName = "../log/log_%s.log";
 		String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 
 		return String.format(baseFileName, timeStamp);

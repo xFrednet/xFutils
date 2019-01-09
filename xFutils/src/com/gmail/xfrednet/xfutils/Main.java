@@ -308,7 +308,10 @@ public class Main {
 			Logger.logError("Main: The current system does not support a system tray.");
 			return false;
 		}
-		
+
+		// Global Shortcut
+		GlobalShortcut.GetInstance();
+
 		// Create and add TrayIcon
 		try {
 			this.trayIcon = new TrayIcon(MAIN_ICON);
