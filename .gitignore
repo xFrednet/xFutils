@@ -1,5 +1,7 @@
 # xFutils files
 settings.txt
+plugins/
+links/
 
 # Output directory
 out/

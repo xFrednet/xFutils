@@ -1,0 +1,39 @@
+Network access
+	checkAccept(String host, int port)
+	checkConnect(String host, int port)
+	checkConnect(String host, int port, Object context)
+	checkListen(int port)
+	checkMulticast(InetAddress maddr)
+Thread access
+	checkAccess(Thread t)
+	checkAccess(ThreadGroup g)
+	checkExec(String cmd)
+AWT access
+	checkAwtEventQueueAccess()
+
+Global files access
+	checkRead(String file)
+	
+Single:
+	checkCreateClassLoader()
+	checkLink(String lib)
+	checkPrintJobAccess()
+	checkPropertiesAccess()
+	
+Always:
+	checkMemberAccess(Class<?> clazz, int which)
+	checkPackageAccess(String pkg)
+	checkPackageDefinition(String pkg)
+
+Never:
+	checkExit(int status)
+	
+private boolean networkAccessAllowed   
+private boolean threadAccessAllowed    
+private boolean awtAccessAllowed       
+private boolean globalFileAccessAllowed
+
+private boolean createClassLoaderAllowed     = false;
+private boolean linkLibraryAllowed           = false;
+private boolean printJobAccessAllowed        = false;
+private boolean checkPropertiesAccessAllowed = false;
